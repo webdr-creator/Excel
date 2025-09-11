@@ -304,7 +304,6 @@
         .loading {
             text-align: center; padding: 20px; font-size: 15px; color: #2e7d52;
         }
-        /* رمز التلغرام */
         .telegram-link-container {
             display: flex;
             justify-content: center;
@@ -355,9 +354,9 @@
         <div class="subject-name" id="subject-name"></div>
         <div class="progress-text">السؤال <span id="current-q">1</span> من <span id="total-qs">0</span></div>
         <div class="progress-slider-bar">
-            <div class="slider-labels left"><span id="max-question">10</span></div>
+            <div class="slider-labels left"><span>1</span></div>
             <input type="range" min="1" max="10" value="1" class="slider" id="question-slider">
-            <div class="slider-labels right"><span>1</span></div>
+            <div class="slider-labels right"><span id="max-question">10</span></div>
         </div>
         <div class="navigation-bar-fixed-top" id="nav-top-bar">
             <button class="nav-btn" id="prev-btn" disabled>السابق</button>
@@ -388,7 +387,6 @@
         </button>
     </div>
 </div>
-<!-- رمز تلغرام في الأسفل -->
 <div class="telegram-link-container">
     <a class="telegram-link" href="https://t.me/Saeedqattan" target="_blank" title="تابعنا على تلغرام">
         <i class="fab fa-telegram-plane"></i>
@@ -430,7 +428,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let starredQuestions = [];
     let subjectColumn10 = {};
     let showOnlyStarred = false;
-    // تم تغيير رابط الملف الافتراضي هنا 👇
     const excelFileURL = "https://webdr-creator.github.io/Excel/MCQ3.xlsx";
 
     function getStarStorageKey(subject) {
@@ -531,7 +528,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         userAnswers = new Array(currentQuestions.length).fill(null);
         loadStarredQuestions(currentSubject);
-        currentQuestionIndex = 0;
+        currentQuestionIndex = 0; // <-- ابدأ من السؤال الأول
         showOnlyStarred = false;
         showFeaturedBtn.classList.remove('active');
         showFeaturedBtn.innerHTML = '<i class="fa-regular fa-star"></i> عرض المميزة';
@@ -539,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
         subjectNameElement.textContent = currentSubject;
         maxQuestionLabel.textContent = currentQuestions.length;
         questionSlider.max = currentQuestions.length;
-        questionSlider.value = currentQuestions.length;
+        questionSlider.value = currentQuestions.length; // اجعل السلايدر على أقصى اليمين (أي السؤال الأول)
         updateProgressAndSlider();
         updateStarButton();
         showQuestion();
@@ -570,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
             questionSlider.value = 1;
             updateProgressAndSlider();
         } else {
-            currentQuestionIndex = 0;
+            currentQuestionIndex = 0; // ابدأ من أول سؤال في الأسئلة المميزة
             showQuestion();
             updateProgressAndSlider();
             updateNavigationButtons();
@@ -601,7 +598,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     questionSlider.addEventListener('input', function() {
         const displayed = getDisplayedQuestions();
-        // القيمة 1 = آخر سؤال, والقيمة max = أول سؤال
         const newIndex = displayed.length - parseInt(this.value);
         if (displayed.length > 0 && newIndex >= 0 && newIndex < displayed.length && newIndex !== currentQuestionIndex) {
             currentQuestionIndex = newIndex;
@@ -735,7 +731,6 @@ document.addEventListener('DOMContentLoaded', function() {
         questionContainer.classList.remove('correct','incorrect');
 
         options.forEach((opt, idx) => {
-            // إذا المستخدم اختار هذا الخيار
             if (optionIndex - 1 === idx) {
                 if (isCorrect) {
                     opt.classList.add('correct');
@@ -745,7 +740,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => opt.classList.remove('shake'), 500);
                 }
             }
-            // إذا هذا هو الخيار الصحيح ولم يتم الضغط عليه
             if (isIncorrect && idx === correctIdx) {
                 opt.classList.add('correct');
             }
