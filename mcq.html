@@ -7,12 +7,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { /* ... كما هو ... */ }
-        .container { /* ... كما هو ... */ }
-        header { /* ... كما هو ... */ }
-        .header-icon { /* ... كما هو ... */ }
-        h1 { /* ... كما هو ... */ }
-
+        body {
+            background: linear-gradient(135deg, #c6efd9 0%, #e2f7eb 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+        header {
+            background: #2e7d52;
+            color: white;
+            padding: 18px 10px 18px 10px;
+            text-align: center;
+        }
+        .header-icon {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 42px;
+            filter: drop-shadow(0 4px 12px #ffd70099);
+        }
+        h1 { font-size: 27px; margin-bottom: 3px; font-weight: bold;}
         .progress-slider-bar {
             width: 100%;
             margin: 15px 0 10px 0;
@@ -21,7 +49,7 @@
             align-items: center;
             gap: 8px;
             position: relative;
-            flex-direction: row-reverse; /* عكس الاتجاه ليبدأ من اليمين */
+            flex-direction: row-reverse; /* يبدأ من اليمين */
         }
         .slider-labels { width: 28px; text-align: center; color: #2e7d52; font-weight: bold; }
         .slider {
@@ -34,12 +62,12 @@
             outline: none;
             position: relative;
             z-index: 1;
-            direction: rtl; /* عكس السلايدر ليبدأ من اليمين */
+            direction: rtl; /* شريط السحب يبدأ من اليمين */
         }
         .slider::-webkit-slider-runnable-track {
             height: 10px;
             background: linear-gradient(
-                to left, /* الامتلاء من اليمين لليسار */
+                to left,
                 #2e7d52 0,
                 #2e7d52 var(--progress,0%),
                 #e0e0e0 var(--progress,0%),
@@ -47,7 +75,28 @@
             );
             border-radius: 7px;
         }
-        .slider::-webkit-slider-thumb { /* كما هو */ }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #2e7d52;
+            border: 2px solid #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #aaa;
+            margin-top: -6px;
+            transition: background 0.2s;
+            z-index: 2;
+            position: relative;
+        }
+        .slider:focus { outline: none; }
+        .slider::-moz-range-thumb {
+            width: 22px; height: 22px;
+            border-radius: 50%; background: #2e7d52; cursor: pointer; border: 2px solid #fff;
+            box-shadow: 0 2px 8px #aaa;
+            transition: background 0.2s;
+        }
         .slider::-moz-range-track {
             height: 10px;
             background: linear-gradient(
@@ -59,26 +108,468 @@
             );
             border-radius: 7px;
         }
-        /* ... باقي التنسيقات ... */
+        .slider::-ms-fill-lower {
+            background: #2e7d52;
+            border-radius: 7px;
+        }
+        .slider::-ms-fill-upper {
+            background: #e0e0e0;
+            border-radius: 7px;
+        }
+        .slider:focus::-webkit-slider-thumb { outline: none; }
+        .slider::-moz-range-progress {
+            background-color: #2e7d52;
+            height: 10px;
+            border-radius: 7px;
+        }
+        .slider::-ms-fill-lower { background-color: #2e7d52; }
+        .slider::-ms-fill-upper { background-color: #e0e0e0; }
+        .slider-labels.left, .slider-labels.right { font-size: 13px; }
+        .slider:focus { outline: none; box-shadow: none; }
+        .subject-selection { padding: 15px; text-align: center;}
+        .selection-container {
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 10px 0;
+        }
+        select {
+            padding: 8px 12px; border-radius: 7px; border: 2px solid #2e7d52;
+            font-size: 14px; width: 100%; max-width: 230px;
+        }
+        .start-btn {
+            padding: 9px 20px; background: #2e7d52; color: white; border: none;
+            border-radius: 7px; cursor: pointer; font-size: 14px; font-weight: bold; transition: all 0.3s;
+            margin-top: 12px;
+        }
+        .start-btn:hover {
+            background: #1e5e3b; transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .exam-section { padding: 12px; display: none;}
+        .subject-name {
+            text-align: center; font-size: 17px; font-weight: bold; color: #2e7d52;
+            margin-bottom: 13px; padding: 7px; background: #e8f5e9; border-radius: 7px;
+        }
+        .progress-text { text-align: center; font-weight: bold; color: #2e7d52; margin-bottom: 7px; font-size: 13px;}
+        .question-container {
+            margin-bottom: 18px; padding: 13px 12px 12px 12px; border: 2px solid #ddd;
+            border-radius: 8px; background: #f9f9f9; position: relative; min-height: 110px;
+            display: flex; flex-direction: column; align-items: stretch;
+            transition: border-color 0.3s;
+        }
+        .question-header-bar {
+            display: flex; align-items: center; gap: 9px; margin-bottom: 7px; width:100%;
+        }
+        .star-btn {
+            background: none; border: none;
+            font-size: 23px; color: #ccc; cursor: pointer; transition: all 0.3s;
+            margin: 0 0 0 8px; padding:0;
+            order: 2;
+        }
+        .star-btn .fa-star {
+            text-shadow: 0 2px 5px #ffc10777, 0 1px 2px #fff;
+        }
+        .star-btn.starred,
+        .star-btn.starred .fa-star{
+            color: #ffc107 !important;
+            text-shadow: 0 2px 5px #c6efd9, 0 1px 2px #fff,0 0 8px #ffc107cc;
+        }
+        .star-btn:hover { color: #ffc107;}
+        .question-text {
+            font-size: 15px; color: #2c3e50; font-weight: 500;
+            line-height: 1.5; order: 1; flex: 1; padding: 0; margin: 0;
+            word-break: break-word;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 120px;
+            margin-bottom: 5px;
+        }
+        .option {
+            padding: 9px;
+            background: #f8f8f8;
+            border: 2px solid #e0e0e0;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .option:hover { border-color: #2e7d52; background: #f0f8f1;}
+        .correct {
+            border-color: #4caf50 !important;
+            border-width: 4px !important;
+            color: #2c3e50;
+            background: #f9f9f9 !important;
+        }
+        .incorrect {
+            border-color: #f44336 !important;
+            border-width: 4px !important;
+            color: #2c3e50;
+            background: #f9f9f9 !important;
+        }
+        .navigation-bar-fixed-top {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            background: #fff;
+            z-index: 30;
+            padding: 7px 0 7px 0;
+            margin: 0 -12px 10px -12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .nav-btn {
+            padding: 5px 13px;
+            background: #2e7d52;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            min-width: 54px;
+        }
+        .nav-btn:disabled { background: #cccccc; cursor: not-allowed;}
+        .nav-btn:hover:not(:disabled) {
+            background: #1e5e3b; transform: translateY(-2px);
+        }
+        .show-featured-btn {
+            padding: 2px 10px;
+            background: #fffbe6;
+            color: #d58500;
+            border: 1px solid #ffb300;
+            border-radius: 7px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-width: 0;
+            font-weight: 500;
+        }
+        .show-featured-btn.active {
+            background: #ffecb3;
+        }
+        .show-featured-btn i {
+            font-size: 13px;
+            margin-left: 3px;
+        }
+        .home-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 2px 8px;
+            color: #2e7d52;
+            transition: background 0.2s;
+            line-height: 1;
+        }
+        .home-btn:hover {
+            background: #e3f2fd;
+            border-radius: 50%;
+        }
+        .results-section { padding: 25px; text-align: center; display: none;}
+        .results-section h2 { color: #2e7d52; margin-bottom: 15px;}
+        .score {
+            font-size: 36px; font-weight: bold; color: #2e7d52; margin: 16px 0;
+        }
+        .restart-btn {
+            padding: 10px 30px; background: #2e7d52; color: white; border: none;
+            border-radius: 7px; cursor: pointer; font-size: 14px; font-weight: bold; transition: all 0.3s;
+            margin-top: 22px;
+        }
+        .restart-btn:hover {
+            background: #1e5e3b; transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .shake { animation: shake 0.5s;}
+        @keyframes shake {
+            0% { transform: translateX(0);}
+            20% { transform: translateX(-10px);}
+            40% { transform: translateX(10px);}
+            60% { transform: translateX(-10px);}
+            80% { transform: translateX(10px);}
+            100% { transform: translateX(0);}
+        }
+        .column10-info {
+            background: #e8f5e9; padding: 13px; border-radius: 7px; margin: 11px 0;
+            border-right: 5px solid #2e7d52; font-size: 13px; line-height: 1.6;
+        }
+        .bottom-back-btn {
+            padding: 8px 16px; background: #2e7d52; color: white; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 13px; transition: all 0.3s;
+            margin: 14px auto; display: block;
+        }
+        .bottom-back-btn:hover {
+            background: #1e5e3b; transform: translateY(-2px);
+        }
+        .loading {
+            text-align: center; padding: 20px; font-size: 15px; color: #2e7d52;
+        }
     </style>
 </head>
 <body>
 <audio id="click-audio" src="https://cdn.pixabay.com/audio/2022/11/16/audio_12bfa6f1e1.mp3"></audio>
 <div class="container">
-    <!-- ... -->
-    <div class="progress-slider-bar">
-        <div class="slider-labels left"><span id="max-question">10</span></div>
-        <input type="range" min="1" max="10" value="1" class="slider" id="question-slider">
-        <div class="slider-labels right"><span>1</span></div>
+    <header>
+        <div class="header-icon">
+            🥇
+        </div>
+        <h1>WAY</h1>
+    </header>
+    <div class="loading" id="loading">
+        <i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات الاختبار...
     </div>
-    <!-- ... باقي الصفحة ... -->
+    <div class="subject-selection" id="subject-section" style="display: none;">
+        <h2>اختر المادة:</h2>
+        <div class="selection-container">
+            <select id="subject-select"></select>
+            <div class="column10-info" id="column10-info"></div>
+        </div>
+        <button class="start-btn" id="start-btn">بدء الاختبار</button>
+    </div>
+    <div class="exam-section" id="exam-section">
+        <div class="subject-name" id="subject-name"></div>
+        <div class="progress-text">السؤال <span id="current-q">1</span> من <span id="total-qs">0</span></div>
+        <div class="progress-slider-bar">
+            <div class="slider-labels left"><span id="max-question">10</span></div>
+            <input type="range" min="1" max="10" value="1" class="slider" id="question-slider">
+            <div class="slider-labels right"><span>1</span></div>
+        </div>
+        <div class="navigation-bar-fixed-top" id="nav-top-bar">
+            <button class="nav-btn" id="prev-btn" disabled>السابق</button>
+            <button class="nav-btn" id="next-btn">التالي</button>
+            <button class="show-featured-btn" id="show-featured-btn" title="عرض المميزة"><i class="fa-regular fa-star"></i> عرض المميزة</button>
+            <button class="home-btn" id="nav-home-btn" title="الصفحة الرئيسية"><i class="fas fa-home"></i></button>
+        </div>
+        <div class="question-container" id="question-container">
+            <div class="question-header-bar">
+                <button class="star-btn" id="star-btn" title="تمييز السؤال">
+                    <i class="fa-regular fa-star"></i>
+                </button>
+                <div class="question-text" id="question-text"></div>
+            </div>
+            <div class="options-container" id="options-container"></div>
+        </div>
+        <button class="bottom-back-btn" id="bottom-back-btn" style="display:none">
+            <i class="fas fa-home"></i> العودة للبداية
+        </button>
+    </div>
+    <div class="results-section" id="results-section">
+        <h2>لقد أكملت الاختبار!</h2>
+        <p>درجتك النهائية هي:</p>
+        <div class="score" id="score">0/0</div>
+        <button class="restart-btn" id="restart-btn">إعادة الاختبار</button>
+        <button class="bottom-back-btn" id="results-back-btn">
+            <i class="fas fa-home"></i> العودة للبداية
+        </button>
+    </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ... باقي المتغيرات كما هي ...
+    const loadingElement = document.getElementById('loading');
+    const subjectSection = document.getElementById('subject-section');
+    const subjectSelect = document.getElementById('subject-select');
+    const column10Info = document.getElementById('column10-info');
+    const startBtn = document.getElementById('start-btn');
+    const examSection = document.getElementById('exam-section');
+    const subjectNameElement = document.getElementById('subject-name');
+    const resultsSection = document.getElementById('results-section');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const currentQ = document.getElementById('current-q');
+    const totalQs = document.getElementById('total-qs');
+    const scoreElement = document.getElementById('score');
+    const restartBtn = document.getElementById('restart-btn');
+    const bottomBackBtn = document.getElementById('bottom-back-btn');
+    const resultsBackBtn = document.getElementById('results-back-btn');
+    const questionSlider = document.getElementById('question-slider');
+    const maxQuestionLabel = document.getElementById('max-question');
+    const starBtn = document.getElementById('star-btn');
+    const showFeaturedBtn = document.getElementById('show-featured-btn');
+    const navHomeBtn = document.getElementById('nav-home-btn');
+    const questionContainer = document.getElementById('question-container');
+    const clickAudio = document.getElementById('click-audio');
+    // بيانات التطبيق
+    let questionsData = [];
+    let currentSubject = '';
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let userAnswers = [];
+    let starredQuestions = [];
+    let subjectColumn10 = {};
+    let showOnlyStarred = false;
+    const excelFileURL = "https://webdr-creator.github.io/Excel/MCQ2.xlsx";
+
+    function getStarStorageKey(subject) {
+        return `starredQuestions_${subject}`;
+    }
+    function loadStarredQuestions(subject) {
+        try {
+            const saved = localStorage.getItem(getStarStorageKey(subject));
+            if (saved) {
+                starredQuestions = JSON.parse(saved);
+            } else {
+                starredQuestions = [];
+            }
+        } catch (e) {
+            starredQuestions = [];
+        }
+    }
+    function saveStarredQuestions(subject) {
+        localStorage.setItem(getStarStorageKey(subject), JSON.stringify(starredQuestions));
+    }
+
+    loadExcelFile(excelFileURL);
+    function loadExcelFile(url) {
+        loadingElement.style.display = 'block';
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('حدث خطأ في تحميل الملف');
+                return response.arrayBuffer();
+            })
+            .then(data => {
+                processExcelData(data);
+                loadingElement.style.display = 'none';
+                subjectSection.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loadingElement.innerHTML = '<p style="color: red;">فشل في تحميل ملف Excel. يرجى التحقق من الاتصال بالإنترنت.</p>';
+            });
+    }
+    function processExcelData(data) {
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+        questionsData = [];
+        const subjects = new Set();
+        subjectColumn10 = {};
+        const startRow = jsonData[0].length > 0 && isNaN(jsonData[0][0]) ? 1 : 0;
+        for (let i = startRow; i < jsonData.length; i++) {
+            const row = jsonData[i];
+            if (!row || row.length < 7) continue;
+            const question = {
+                text: row[0] || 'بدون نص',
+                options: [],
+                correctAnswer: parseInt(row[6]) || 1,
+                subject: row[8] || 'عام',
+                id: i
+            };
+            for (let j = 1; j <= 5; j++) {
+                if (row[j]) question.options.push(row[j]);
+            }
+            if (question.options.length === 0) {
+                question.options.push('نعم');
+                question.options.push('لا');
+            }
+            questionsData.push(question);
+            subjects.add(question.subject);
+            if (row[9] && !subjectColumn10[question.subject]) {
+                subjectColumn10[question.subject] = row[9];
+            }
+        }
+        subjectSelect.innerHTML = '';
+        subjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+        currentSubject = subjectSelect.value;
+        updateColumn10Info();
+        loadStarredQuestions(currentSubject);
+    }
+    function updateColumn10Info() {
+        const info = subjectColumn10[currentSubject] || 'لا توجد معلومات إضافية';
+        column10Info.textContent = info;
+    }
+    subjectSelect.addEventListener('change', function() {
+        currentSubject = this.value;
+        updateColumn10Info();
+        loadStarredQuestions(currentSubject);
+        if (examSection.style.display === 'block') updateStarButton();
+    });
+    startBtn.addEventListener('click', function() {
+        currentSubject = subjectSelect.value;
+        currentQuestions = questionsData.filter(q => q.subject === currentSubject);
+        if (currentQuestions.length === 0) {
+            alert('لا توجد أسئلة لهذه المادة');
+            return;
+        }
+        userAnswers = new Array(currentQuestions.length).fill(null);
+        loadStarredQuestions(currentSubject);
+        currentQuestionIndex = 0;
+        showOnlyStarred = false;
+        showFeaturedBtn.classList.remove('active');
+        showFeaturedBtn.innerHTML = '<i class="fa-regular fa-star"></i> عرض المميزة';
+        totalQs.textContent = currentQuestions.length;
+        subjectNameElement.textContent = currentSubject;
+        maxQuestionLabel.textContent = currentQuestions.length;
+        questionSlider.max = currentQuestions.length;
+        questionSlider.value = currentQuestions.length;
+        updateProgressAndSlider();
+        updateStarButton();
+        showQuestion();
+        subjectSection.style.display = 'none';
+        examSection.style.display = 'block';
+    });
+    function getDisplayedQuestions() {
+        if (showOnlyStarred) {
+            return currentQuestions.filter(q => starredQuestions.includes(q.id));
+        }
+        return currentQuestions;
+    }
+    showFeaturedBtn.addEventListener('click', function() {
+        showOnlyStarred = !showOnlyStarred;
+        this.classList.toggle('active', showOnlyStarred);
+        this.innerHTML = showOnlyStarred
+            ? '<i class="fa-regular fa-star"></i> عرض الكل'
+            : '<i class="fa-regular fa-star"></i> عرض المميزة';
+        const displayed = getDisplayedQuestions();
+        if (displayed.length === 0) {
+            questionText.innerHTML = '<p>لا توجد أسئلة مميزة بعد.</p>';
+            optionsContainer.innerHTML = '';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            currentQ.textContent = 0;
+            totalQs.textContent = 0;
+            questionSlider.max = 1;
+            questionSlider.value = 1;
+            updateProgressAndSlider();
+        } else {
+            currentQuestionIndex = 0;
+            showQuestion();
+            updateProgressAndSlider();
+            updateNavigationButtons();
+        }
+    });
+
+    navHomeBtn.addEventListener('click', function() {
+        subjectSection.style.display = 'block';
+        examSection.style.display = 'none';
+        resultsSection.style.display = 'none';
+    });
+
+    function updateStarButton() {
+        const displayedQuestions = getDisplayedQuestions();
+        if (displayedQuestions.length === 0) return;
+        const question = displayedQuestions[currentQuestionIndex];
+        const isStarred = starredQuestions.includes(question.id);
+        const starIcon = starBtn.querySelector('i');
+        if (isStarred) {
+            starBtn.classList.add('starred');
+            starIcon.classList.remove('fa-regular');
+            starIcon.classList.add('fa-solid');
+        } else {
+            starBtn.classList.remove('starred');
+            starIcon.classList.remove('fa-solid');
+            starIcon.classList.add('fa-regular');
+        }
+    }
     questionSlider.addEventListener('input', function() {
         const displayed = getDisplayedQuestions();
-        // عكس الترتيب: القيمة 1 تعني آخر سؤال، max تعني أول سؤال
+        // القيمة 1 = آخر سؤال, والقيمة max = أول سؤال
         const newIndex = displayed.length - parseInt(this.value);
         if (displayed.length > 0 && newIndex >= 0 && newIndex < displayed.length && newIndex !== currentQuestionIndex) {
             currentQuestionIndex = newIndex;
@@ -87,9 +578,105 @@ document.addEventListener('DOMContentLoaded', function() {
             updateStarButton();
         }
     });
+    starBtn.addEventListener('click', function() {
+        const displayedQuestions = getDisplayedQuestions();
+        if (displayedQuestions.length === 0) return;
+        const question = displayedQuestions[currentQuestionIndex];
+        const questionId = question.id;
+        const index = starredQuestions.indexOf(questionId);
+        const starIcon = this.querySelector('i');
+        if (index === -1) {
+            starredQuestions.push(questionId);
+            this.classList.add('starred');
+            starIcon.classList.remove('fa-regular');
+            starIcon.classList.add('fa-solid');
+        } else {
+            starredQuestions.splice(index, 1);
+            this.classList.remove('starred');
+            starIcon.classList.remove('fa-solid');
+            starIcon.classList.add('fa-regular');
+        }
+        saveStarredQuestions(currentSubject);
+        if (showOnlyStarred) {
+            const displayed = getDisplayedQuestions();
+            if (displayed.length === 0) {
+                questionText.innerHTML = '<p>لا توجد أسئلة مميزة بعد.</p>';
+                optionsContainer.innerHTML = '';
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                currentQ.textContent = 0;
+                totalQs.textContent = 0;
+                questionSlider.max = 1;
+                questionSlider.value = 1;
+                updateProgressAndSlider();
+            } else {
+                if (currentQuestionIndex >= displayed.length) {
+                    currentQuestionIndex = displayed.length - 1;
+                }
+                showQuestion();
+                updateNavigationButtons();
+                updateProgressAndSlider();
+            }
+        }
+    });
+
     function showQuestion() {
         const displayedQuestions = getDisplayedQuestions();
-        // ... (باقي الدالة كما هو) ...
+        if (displayedQuestions.length === 0) {
+            questionText.innerHTML = '<p>لا توجد أسئلة لعرضها.</p>';
+            optionsContainer.innerHTML = '';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            currentQ.textContent = 0;
+            totalQs.textContent = 0;
+            questionSlider.max = 1;
+            questionSlider.value = 1;
+            updateProgressAndSlider();
+            questionContainer.classList.remove('correct','incorrect');
+            return;
+        }
+        const question = displayedQuestions[currentQuestionIndex];
+        questionText.textContent = question.text;
+        optionsContainer.innerHTML = '';
+        const originalIndex = currentQuestions.findIndex(q => q.id === question.id);
+        let isAnswered = userAnswers[originalIndex] !== null;
+        questionContainer.classList.remove('correct','incorrect');
+
+        // حساب الإجابة الصحيحة
+        let correctIdx = question.correctAnswer - 1;
+        let userSelectedIdx = isAnswered ? userAnswers[originalIndex] - 1 : -1;
+        // إظهار الخيارات وتلوينها
+        question.options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.className = 'option';
+            optionElement.textContent = option;
+            if (isAnswered) {
+                // الإجابة الصحيحة
+                if (index === correctIdx) {
+                    // إذا أجاب خطأ، أبرز الصحيحة حتى لو لم يضغط عليها
+                    if (userSelectedIdx !== correctIdx) {
+                        optionElement.classList.add('correct');
+                    }
+                }
+                // إجابة المستخدم
+                if (userSelectedIdx === index) {
+                    if (userSelectedIdx === correctIdx) {
+                        optionElement.classList.add('correct');
+                    } else {
+                        optionElement.classList.add('incorrect');
+                    }
+                }
+            }
+            optionElement.addEventListener('click', () => selectOption(index + 1, question.id));
+            optionsContainer.appendChild(optionElement);
+        });
+        for (let i = question.options.length; i < 5; i++) {
+            let filler = document.createElement('div');
+            filler.className = 'option';
+            filler.style.visibility = 'hidden';
+            filler.innerHTML = '&nbsp;';
+            optionsContainer.appendChild(filler);
+        }
         // تحديث مؤشر السؤال الحالي (عكس الترتيب)
         currentQ.textContent = displayedQuestions.length - currentQuestionIndex;
         totalQs.textContent = displayedQuestions.length;
@@ -97,8 +684,95 @@ document.addEventListener('DOMContentLoaded', function() {
         // عكس السلايدر
         questionSlider.max = displayedQuestions.length;
         questionSlider.value = displayedQuestions.length - currentQuestionIndex;
-        // ... باقي الدالة ...
+        updateNavigationButtons();
+        updateStarButton();
+        updateProgressAndSlider();
     }
+
+    function selectOption(optionIndex, questionId) {
+        const originalIndex = currentQuestions.findIndex(q => q.id === questionId);
+        if (userAnswers[originalIndex] !== null) return;
+        playClick();
+        userAnswers[originalIndex] = optionIndex;
+        const displayedQuestions = getDisplayedQuestions();
+        const question = displayedQuestions[currentQuestionIndex];
+        const correctIdx = question.correctAnswer - 1;
+        const options = optionsContainer.querySelectorAll('.option');
+        let isCorrect = optionIndex === question.correctAnswer;
+        let isIncorrect = !isCorrect;
+        questionContainer.classList.remove('correct','incorrect');
+
+        options.forEach((opt, idx) => {
+            // إذا المستخدم اختار هذا الخيار
+            if (optionIndex - 1 === idx) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                } else {
+                    opt.classList.add('incorrect');
+                    opt.classList.add('shake');
+                    setTimeout(() => opt.classList.remove('shake'), 500);
+                }
+            }
+            // إذا هذا هو الخيار الصحيح ولم يتم الضغط عليه
+            if (isIncorrect && idx === correctIdx) {
+                opt.classList.add('correct');
+            }
+        });
+
+        if (isIncorrect) {
+            options[optionIndex - 1].classList.add('shake');
+            setTimeout(() => options[optionIndex - 1].classList.remove('shake'), 500);
+            setTimeout(() => {
+                if (currentQuestionIndex < displayedQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                    updateProgressAndSlider();
+                }
+            }, 1500);
+        } else {
+            setTimeout(() => {
+                if (currentQuestionIndex < displayedQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                    updateProgressAndSlider();
+                } else {
+                    showResults();
+                }
+            }, 900);
+        }
+        updateNavigationButtons();
+    }
+
+    function updateNavigationButtons() {
+        const displayed = getDisplayedQuestions();
+        prevBtn.disabled = currentQuestionIndex === displayed.length - 1 || displayed.length === 0;
+        nextBtn.disabled = displayed.length === 0;
+        if (currentQuestionIndex === 0) {
+            nextBtn.textContent = 'إنهاء الاختبار';
+        } else {
+            nextBtn.textContent = 'التالي';
+        }
+    }
+    prevBtn.addEventListener('click', function() {
+        const displayed = getDisplayedQuestions();
+        if (currentQuestionIndex < displayed.length - 1 && displayed.length > 0) {
+            currentQuestionIndex++;
+            showQuestion();
+            updateProgressAndSlider();
+            updateNavigationButtons();
+        }
+    });
+    nextBtn.addEventListener('click', function() {
+        const displayed = getDisplayedQuestions();
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            showQuestion();
+            updateProgressAndSlider();
+            updateNavigationButtons();
+        } else {
+            showResults();
+        }
+    });
     function updateProgressAndSlider() {
         const displayedQuestions = getDisplayedQuestions();
         let percent = 0;
@@ -109,7 +783,37 @@ document.addEventListener('DOMContentLoaded', function() {
         maxQuestionLabel.textContent = displayedQuestions.length;
         questionSlider.style.setProperty('--progress', percent + '%');
     }
-    // ... باقي الكود كما هو ...
+    function showResults() {
+        let correct = 0;
+        for (let i = 0; i < currentQuestions.length; i++) {
+            if (userAnswers[i] === currentQuestions[i].correctAnswer)
+                correct++;
+        }
+        scoreElement.textContent = `${correct}/${currentQuestions.length}`;
+        examSection.style.display = 'none';
+        resultsSection.style.display = 'block';
+    }
+    restartBtn.addEventListener('click', function() {
+        subjectSection.style.display = 'block';
+        examSection.style.display = 'none';
+        resultsSection.style.display = 'none';
+    });
+    bottomBackBtn.addEventListener('click', function() {
+        subjectSection.style.display = 'block';
+        examSection.style.display = 'none';
+        resultsSection.style.display = 'none';
+    });
+    resultsBackBtn.addEventListener('click', function() {
+        subjectSection.style.display = 'block';
+        examSection.style.display = 'none';
+        resultsSection.style.display = 'none';
+    });
+    function playClick() {
+        if (clickAudio) {
+            clickAudio.currentTime = 0;
+            clickAudio.play();
+        }
+    }
 });
 </script>
 </body>
