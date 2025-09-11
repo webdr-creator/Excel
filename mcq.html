@@ -49,7 +49,7 @@
             align-items: center;
             gap: 8px;
             position: relative;
-            flex-direction: row-reverse;
+            flex-direction: row; /* تم التعديل هنا */
         }
         .slider-labels { width: 28px; text-align: center; color: #2e7d52; font-weight: bold; }
         .slider {
@@ -64,10 +64,11 @@
             z-index: 1;
             direction: ltr;
         }
+        /* شريط التقدم: يبدأ رمادي ويمتلئ أخضر من موضع المؤشر */
         .slider::-webkit-slider-runnable-track {
             height: 10px;
             background: linear-gradient(
-                to left,
+                to right,
                 #2e7d52 0,
                 #2e7d52 var(--progress,0%),
                 #e0e0e0 var(--progress,0%),
@@ -100,7 +101,7 @@
         .slider::-moz-range-track {
             height: 10px;
             background: linear-gradient(
-                to left,
+                to right,
                 #2e7d52 0,
                 #2e7d52 var(--progress,0%),
                 #e0e0e0 var(--progress,0%),
@@ -567,181 +568,16 @@ document.addEventListener('DOMContentLoaded', function() {
             starIcon.classList.add('fa-regular');
         }
     }
-
-    // تزامن المؤشر مع شريط التقدم مع السحب والتبديل والتقدم/رجوع
     questionSlider.addEventListener('input', function() {
         const displayed = getDisplayedQuestions();
-        const newIndex = displayed.length - parseInt(this.value);
+        const newIndex = parseInt(this.value) - 1;
         if (displayed.length > 0 && newIndex >= 0 && newIndex < displayed.length && newIndex !== currentQuestionIndex) {
             currentQuestionIndex = newIndex;
             showQuestion();
-        }
-        updateProgressAndSlider();
-        updateStarButton();
-    });
-
-    // عند الانتقال للأسئلة أو الرجوع يتم أيضًا تحديث المؤشر والسلايدر
-    prevBtn.addEventListener('click', function() {
-        const displayed = getDisplayedQuestions();
-        if (currentQuestionIndex < displayed.length - 1 && displayed.length > 0) {
-            currentQuestionIndex++;
-            showQuestion();
-        }
-        updateProgressAndSlider();
-        updateNavigationButtons();
-    });
-    nextBtn.addEventListener('click', function() {
-        const displayed = getDisplayedQuestions();
-        if (currentQuestionIndex > 0) {
-            currentQuestionIndex--;
-            showQuestion();
             updateProgressAndSlider();
-            updateNavigationButtons();
-        } else {
-            showResults();
+            updateStarButton();
         }
     });
-
-    function showQuestion() {
-        const displayedQuestions = getDisplayedQuestions();
-        if (displayedQuestions.length === 0) {
-            questionText.innerHTML = '<p>لا توجد أسئلة لعرضها.</p>';
-            optionsContainer.innerHTML = '';
-            prevBtn.disabled = true;
-            nextBtn.disabled = true;
-            currentQ.textContent = 0;
-            totalQs.textContent = 0;
-            questionSlider.max = 1;
-            questionSlider.value = 1;
-            updateProgressAndSlider();
-            questionContainer.classList.remove('correct','incorrect');
-            return;
-        }
-        const question = displayedQuestions[currentQuestionIndex];
-        questionText.textContent = question.text;
-        optionsContainer.innerHTML = '';
-        const originalIndex = currentQuestions.findIndex(q => q.id === question.id);
-        let isAnswered = userAnswers[originalIndex] !== null;
-        questionContainer.classList.remove('correct','incorrect');
-
-        // حساب الإجابة الصحيحة
-        let correctIdx = question.correctAnswer - 1;
-        let userSelectedIdx = isAnswered ? userAnswers[originalIndex] - 1 : -1;
-        // إظهار الخيارات وتلوينها
-        question.options.forEach((option, index) => {
-            const optionElement = document.createElement('div');
-            optionElement.className = 'option';
-            optionElement.textContent = option;
-            if (isAnswered) {
-                // الإجابة الصحيحة
-                if (index === correctIdx) {
-                    if (userSelectedIdx !== correctIdx) {
-                        optionElement.classList.add('correct');
-                    }
-                }
-                if (userSelectedIdx === index) {
-                    if (userSelectedIdx === correctIdx) {
-                        optionElement.classList.add('correct');
-                    } else {
-                        optionElement.classList.add('incorrect');
-                    }
-                }
-            }
-            optionElement.addEventListener('click', () => selectOption(index + 1, question.id));
-            optionsContainer.appendChild(optionElement);
-        });
-        for (let i = question.options.length; i < 5; i++) {
-            let filler = document.createElement('div');
-            filler.className = 'option';
-            filler.style.visibility = 'hidden';
-            filler.innerHTML = '&nbsp;';
-            optionsContainer.appendChild(filler);
-        }
-        // تحديث مؤشر السؤال الحالي (عكس الترتيب)
-        currentQ.textContent = displayedQuestions.length - currentQuestionIndex;
-        totalQs.textContent = displayedQuestions.length;
-
-        // عكس السلايدر
-        questionSlider.max = displayedQuestions.length;
-        questionSlider.value = displayedQuestions.length - currentQuestionIndex;
-        updateNavigationButtons();
-        updateStarButton();
-        updateProgressAndSlider();
-    }
-
-    function selectOption(optionIndex, questionId) {
-        const originalIndex = currentQuestions.findIndex(q => q.id === questionId);
-        if (userAnswers[originalIndex] !== null) return;
-        playClick();
-        userAnswers[originalIndex] = optionIndex;
-        const displayedQuestions = getDisplayedQuestions();
-        const question = displayedQuestions[currentQuestionIndex];
-        const correctIdx = question.correctAnswer - 1;
-        const options = optionsContainer.querySelectorAll('.option');
-        let isCorrect = optionIndex === question.correctAnswer;
-        let isIncorrect = !isCorrect;
-        questionContainer.classList.remove('correct','incorrect');
-
-        options.forEach((opt, idx) => {
-            if (optionIndex - 1 === idx) {
-                if (isCorrect) {
-                    opt.classList.add('correct');
-                } else {
-                    opt.classList.add('incorrect');
-                    opt.classList.add('shake');
-                    setTimeout(() => opt.classList.remove('shake'), 500);
-                }
-            }
-            if (isIncorrect && idx === correctIdx) {
-                opt.classList.add('correct');
-            }
-        });
-
-        if (isIncorrect) {
-            options[optionIndex - 1].classList.add('shake');
-            setTimeout(() => options[optionIndex - 1].classList.remove('shake'), 500);
-            setTimeout(() => {
-                if (currentQuestionIndex < displayedQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    showQuestion();
-                }
-                updateProgressAndSlider();
-            }, 1500);
-        } else {
-            setTimeout(() => {
-                if (currentQuestionIndex < displayedQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    showQuestion();
-                    updateProgressAndSlider();
-                } else {
-                    showResults();
-                }
-            }, 900);
-        }
-        updateNavigationButtons();
-    }
-
-    function updateNavigationButtons() {
-        const displayed = getDisplayedQuestions();
-        prevBtn.disabled = currentQuestionIndex === displayed.length - 1 || displayed.length === 0;
-        nextBtn.disabled = displayed.length === 0;
-        if (currentQuestionIndex === 0) {
-            nextBtn.textContent = 'إنهاء الاختبار';
-        } else {
-            nextBtn.textContent = 'التالي';
-        }
-    }
-
-    function updateProgressAndSlider() {
-        const displayedQuestions = getDisplayedQuestions();
-        let percent = 0;
-        if (displayedQuestions.length > 0)
-            percent = ((displayedQuestions.length - currentQuestionIndex) / displayedQuestions.length) * 100;
-        questionSlider.max = displayedQuestions.length;
-        questionSlider.value = displayedQuestions.length - currentQuestionIndex;
-        maxQuestionLabel.textContent = displayedQuestions.length;
-        questionSlider.style.setProperty('--progress', percent + '%');
-    }
     starBtn.addEventListener('click', function() {
         const displayedQuestions = getDisplayedQuestions();
         if (displayedQuestions.length === 0) return;
@@ -784,6 +620,169 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function showQuestion() {
+        const displayedQuestions = getDisplayedQuestions();
+        if (displayedQuestions.length === 0) {
+            questionText.innerHTML = '<p>لا توجد أسئلة لعرضها.</p>';
+            optionsContainer.innerHTML = '';
+            prevBtn.disabled = true;
+            nextBtn.disabled = true;
+            currentQ.textContent = 0;
+            totalQs.textContent = 0;
+            questionSlider.max = 1;
+            questionSlider.value = 1;
+            updateProgressAndSlider();
+            questionContainer.classList.remove('correct','incorrect');
+            return;
+        }
+        const question = displayedQuestions[currentQuestionIndex];
+        questionText.textContent = question.text;
+        optionsContainer.innerHTML = '';
+        const originalIndex = currentQuestions.findIndex(q => q.id === question.id);
+        let isAnswered = userAnswers[originalIndex] !== null;
+        questionContainer.classList.remove('correct','incorrect');
+
+        // حساب الإجابة الصحيحة
+        let correctIdx = question.correctAnswer - 1;
+        let userSelectedIdx = isAnswered ? userAnswers[originalIndex] - 1 : -1;
+        // إظهار الخيارات وتلوينها
+        question.options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.className = 'option';
+            optionElement.textContent = option;
+            if (isAnswered) {
+                // الإجابة الصحيحة
+                if (index === correctIdx) {
+                    // إذا أجاب خطأ، أبرز الصحيحة حتى لو لم يضغط عليها
+                    if (userSelectedIdx !== correctIdx) {
+                        optionElement.classList.add('correct');
+                    }
+                }
+                // إجابة المستخدم
+                if (userSelectedIdx === index) {
+                    if (userSelectedIdx === correctIdx) {
+                        optionElement.classList.add('correct');
+                    } else {
+                        optionElement.classList.add('incorrect');
+                    }
+                }
+            }
+            optionElement.addEventListener('click', () => selectOption(index + 1, question.id));
+            optionsContainer.appendChild(optionElement);
+        });
+        for (let i = question.options.length; i < 5; i++) {
+            let filler = document.createElement('div');
+            filler.className = 'option';
+            filler.style.visibility = 'hidden';
+            filler.innerHTML = '&nbsp;';
+            optionsContainer.appendChild(filler);
+        }
+        // تحديث مؤشر السؤال الحالي
+        currentQ.textContent = currentQuestionIndex + 1;
+        totalQs.textContent = displayedQuestions.length;
+
+        // السلايدر
+        questionSlider.max = displayedQuestions.length;
+        questionSlider.value = currentQuestionIndex + 1;
+        updateNavigationButtons();
+        updateStarButton();
+        updateProgressAndSlider();
+    }
+
+    function selectOption(optionIndex, questionId) {
+        const originalIndex = currentQuestions.findIndex(q => q.id === questionId);
+        if (userAnswers[originalIndex] !== null) return;
+        playClick();
+        userAnswers[originalIndex] = optionIndex;
+        const displayedQuestions = getDisplayedQuestions();
+        const question = displayedQuestions[currentQuestionIndex];
+        const correctIdx = question.correctAnswer - 1;
+        const options = optionsContainer.querySelectorAll('.option');
+        let isCorrect = optionIndex === question.correctAnswer;
+        let isIncorrect = !isCorrect;
+        questionContainer.classList.remove('correct','incorrect');
+
+        options.forEach((opt, idx) => {
+            // إذا المستخدم اختار هذا الخيار
+            if (optionIndex - 1 === idx) {
+                if (isCorrect) {
+                    opt.classList.add('correct');
+                } else {
+                    opt.classList.add('incorrect');
+                    opt.classList.add('shake');
+                    setTimeout(() => opt.classList.remove('shake'), 500);
+                }
+            }
+            // إذا هذا هو الخيار الصحيح ولم يتم الضغط عليه
+            if (isIncorrect && idx === correctIdx) {
+                opt.classList.add('correct');
+            }
+        });
+
+        if (isIncorrect) {
+            options[optionIndex - 1].classList.add('shake');
+            setTimeout(() => options[optionIndex - 1].classList.remove('shake'), 500);
+            setTimeout(() => {
+                if (currentQuestionIndex < displayedQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                    updateProgressAndSlider();
+                }
+            }, 1500);
+        } else {
+            setTimeout(() => {
+                if (currentQuestionIndex < displayedQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    showQuestion();
+                    updateProgressAndSlider();
+                } else {
+                    showResults();
+                }
+            }, 900);
+        }
+        updateNavigationButtons();
+    }
+
+    function updateNavigationButtons() {
+        const displayed = getDisplayedQuestions();
+        prevBtn.disabled = currentQuestionIndex === 0 || displayed.length === 0;
+        nextBtn.disabled = displayed.length === 0;
+        if (currentQuestionIndex === displayed.length - 1) {
+            nextBtn.textContent = 'إنهاء الاختبار';
+        } else {
+            nextBtn.textContent = 'التالي';
+        }
+    }
+    prevBtn.addEventListener('click', function() {
+        const displayed = getDisplayedQuestions();
+        if (currentQuestionIndex > 0 && displayed.length > 0) {
+            currentQuestionIndex--;
+            showQuestion();
+            updateProgressAndSlider();
+            updateNavigationButtons();
+        }
+    });
+    nextBtn.addEventListener('click', function() {
+        const displayed = getDisplayedQuestions();
+        if (currentQuestionIndex < displayed.length - 1) {
+            currentQuestionIndex++;
+            showQuestion();
+            updateProgressAndSlider();
+            updateNavigationButtons();
+        } else {
+            showResults();
+        }
+    });
+    function updateProgressAndSlider() {
+        const displayedQuestions = getDisplayedQuestions();
+        let percent = 0;
+        if (displayedQuestions.length > 0)
+            percent = ((currentQuestionIndex + 1) / displayedQuestions.length) * 100;
+        questionSlider.max = displayedQuestions.length;
+        questionSlider.value = currentQuestionIndex + 1;
+        maxQuestionLabel.textContent = displayedQuestions.length;
+        questionSlider.style.setProperty('--progress', percent + '%');
+    }
     function showResults() {
         let correct = 0;
         for (let i = 0; i < currentQuestions.length; i++) {
