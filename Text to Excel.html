@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق تقسيم النص وتصديره إلى Excel - 7 أعمدة</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .input-section {
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 150px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            line-height: 1.6;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4e54c8;
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.2);
+        }
+        
+        .paste-btn {
+            padding: 0 20px;
+            background-color: #4e54c8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .paste-btn:hover {
+            background-color: #3a3fb8;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #4e54c8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a3fb8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+        
+        .table-section {
+            padding: 25px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        
+        th {
+            background-color: #4e54c8;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        
+        .message {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+            opacity: 0.8;
+        }
+        
+        .row-counter {
+            background-color: #4e54c8;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 992px) {
+            .container {
+                overflow-x: auto;
+            }
+            
+            table {
+                width: 1200px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .input-with-button {
+                flex-direction: column;
+            }
+            
+            .paste-btn {
+                padding: 12px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>تطبيق تقسيم النص وتصديره إلى Excel</h1>
+            <p class="description">الصق نص مكون من 7 أسطر في الحقل أدناه وسيتم تقسيمه تلقائياً</p>
+        </header>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="multilineInput">أدخل النص (7 أسطر):</label>
+                <div class="input-with-button">
+                    <textarea id="multilineInput" placeholder="الصق النص هنا بحيث يحتوي على 7 أسطر...&#10;السطر الثاني&#10;السطر الثالث&#10;السطر الرابع&#10;السطر الخامس&#10;السطر السادس&#10;السطر السابع"></textarea>
+                    <button class="paste-btn" id="pasteButton">
+                        <i class="fas fa-paste"></i> لصق
+                    </button>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn-primary" id="addRow">
+                    <i class="fas fa-plus"></i> إضافة صف جديد
+                </button>
+                <button class="btn-success" id="exportExcel">
+                    <i class="fas fa-file-excel"></i> تصدير إلى Excel
+                </button>
+                <button class="btn-warning" id="clearInput">
+                    <i class="fas fa-eraser"></i> مسح الحقل
+                </button>
+                <button class="btn-danger" id="clearTable">
+                    <i class="fas fa-trash"></i> مسح الجدول
+                </button>
+            </div>
+        </div>
+        
+        <div class="table-section">
+            <h2>الجدول <span class="row-counter">عدد الصفوف: <span id="rowCount">0</span></span></h2>
+            <div class="message info">
+                سيتم تقسيم النص إلى 7 أعمدة، كل سطر في عمود منفصل
+            </div>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>العمود 1</th>
+                        <th>العمود 2</th>
+                        <th>العمود 3</th>
+                        <th>العمود 4</th>
+                        <th>العمود 5</th>
+                        <th>العمود 6</th>
+                        <th>العمود 7</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- سيتم إضافة الصفوف هنا ديناميكيًا -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <footer>
+        <p>تم إنشاء هذا التطبيق باستخدام HTML، CSS و JavaScript</p>
+    </footer>
+
+    <!-- مكتبة SheetJS لإنشاء ملف Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Font Awesome للرموز -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const multilineInput = document.getElementById('multilineInput');
+            const pasteButton = document.getElementById('pasteButton');
+            const addRowBtn = document.getElementById('addRow');
+            const exportExcelBtn = document.getElementById('exportExcel');
+            const clearInputBtn = document.getElementById('clearInput');
+            const clearTableBtn = document.getElementById('clearTable');
+            const tableBody = document.querySelector('#dataTable tbody');
+            const rowCountElement = document.getElementById('rowCount');
+            
+            // مصفوفة لتخزين البيانات
+            let data = [];
+            
+            // دالة اللصق من الحافظة
+            pasteButton.addEventListener('click', async function() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    multilineInput.value = text;
+                    showMessage('تم لصق النص من الحافظة', 'success');
+                } catch (err) {
+                    showMessage('تعذر الوصول إلى الحافظة. يرجى استخدام Ctrl+V', 'error');
+                    multilineInput.focus();
+                }
+            });
+            
+            // إضافة صف جديد
+            addRowBtn.addEventListener('click', function() {
+                const text = multilineInput.value.trim();
+                
+                if (!text) {
+                    showMessage('يرجى إدخال نص أولاً', 'error');
+                    multilineInput.focus();
+                    return;
+                }
+                
+                // تقسيم النص إلى أسطر
+                const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+                
+                // التحقق من أن النص يحتوي على 7 أسطر
+                if (lines.length !== 7) {
+                    showMessage(`يجب أن يحتوي النص على 7 أسطر. لديك حالياً ${lines.length} أسطر. يرجى تعديل النص`, 'error');
+                    return;
+                }
+                
+                // إضافة البيانات إلى المصفوفة
+                data.push(lines);
+                
+                // إضافة الصف إلى الجدول
+                addRowToTable(lines);
+                
+                // تحديث عدد الصفوف
+                updateRowCount();
+                
+                // مسح الحقل
+                multilineInput.value = '';
+                
+                showMessage('تم إضافة الصف بنجاح إلى الجدول', 'success');
+                multilineInput.focus();
+            });
+            
+            // مسح الحقل
+            clearInputBtn.addEventListener('click', function() {
+                multilineInput.value = '';
+                multilineInput.focus();
+                showMessage('تم مسح الحقل', 'info');
+            });
+            
+            // تصدير إلى Excel
+            exportExcelBtn.addEventListener('click', function() {
+                if (data.length === 0) {
+                    showMessage('لا توجد بيانات لتصديرها', 'error');
+                    return;
+                }
+                
+                // إنشاء مصفوفة للبيانات مع العناوين
+                const excelData = [
+                    ['العمود 1', 'العمود 2', 'العمود 3', 'العمود 4', 'العمود 5', 'العمود 6', 'العمود 7'],
+                    ...data
+                ];
+                
+                // إنشاء ورقة عمل
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                
+                // إنشاء مصنف
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'البيانات');
+                
+                // تصدير الملف
+                XLSX.writeFile(wb, 'البيانات.xlsx');
+                
+                showMessage('تم تصدير الملف بنجاح', 'success');
+            });
+            
+            // مسح الجدول
+            clearTableBtn.addEventListener('click', function() {
+                if (data.length === 0) {
+                    showMessage('لا توجد بيانات لمسحها', 'info');
+                    return;
+                }
+                
+                if (confirm('هل أنت متأكد من أنك تريد مسح جميع البيانات؟')) {
+                    data = [];
+                    tableBody.innerHTML = '';
+                    updateRowCount();
+                    showMessage('تم مسح جميع البيانات', 'success');
+                }
+            });
+            
+            // دالة لإضافة صف إلى الجدول
+            function addRowToTable(rowData) {
+                const row = document.createElement('tr');
+                
+                rowData.forEach(cellData => {
+                    const cell = document.createElement('td');
+                    cell.textContent = cellData;
+                    row.appendChild(cell);
+                });
+                
+                tableBody.appendChild(row);
+            }
+            
+            // دالة لتحديث عدد الصفوف
+            function updateRowCount() {
+                rowCountElement.textContent = data.length;
+            }
+            
+            // دالة لعرض الرسائل
+            function showMessage(text, type) {
+                // إزالة أي رسالة سابقة
+                const existingMessage = document.querySelector('.message:not(.info)');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+                
+                // إنشاء عنصر الرسالة
+                const message = document.createElement('div');
+                message.className = `message ${type}`;
+                message.textContent = text;
+                
+                // إضافة الرسالة إلى الصفحة
+                document.querySelector('.input-section').appendChild(message);
+                
+                // إزالة الرسالة بعد 3 ثوان
+                setTimeout(() => {
+                    message.remove();
+                }, 3000);
+            }
+            
+            // السماح بإضافة النص باستخدام Enter في حقل النص (لكن ليس كإرسال للنموذج)
+            multilineInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    addRowBtn.click();
+                }
+            });
+            
+            // التركيز على حقل الإدخال عند تحميل الصفحة
+            multilineInput.focus();
+        });
+    </script>
+</body>
+</html>
