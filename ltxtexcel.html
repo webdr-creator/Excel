@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحويل النص إلى Excel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        h1 {
+            color: #1e6f5c;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .instructions {
+            background: linear-gradient(to right, #e8f5e9, #c8e6c9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-right: 5px solid #4caf50;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .input-section, .output-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .stat-box {
+            background: linear-gradient(to right, #4caf50, #2e7d32);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 180px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 14px 25px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        #convertBtn {
+            background-color: #4caf50;
+        }
+        #convertBtn:hover {
+            background-color: #388e3c;
+        }
+        #clearTextBtn {
+            background-color: #2196f3;
+        }
+        #clearTextBtn:hover {
+            background-color: #0b7dda;
+        }
+        #downloadBtn {
+            background-color: #ff9800;
+        }
+        #downloadBtn:hover {
+            background-color: #f57c00;
+        }
+        #clearTableBtn {
+            background-color: #f44336;
+        }
+        #clearTableBtn:hover {
+            background-color: #d32f2f;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: center;
+        }
+        th {
+            background: linear-gradient(to bottom, #4caf50, #2e7d32);
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e8f5e9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background-color: #4caf50;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        @media (max-width: 768px) {
+            .buttons {
+                flex-direction: column;
+            }
+            .stat-box {
+                min-width: 140px;
+                padding: 12px 20px;
+            }
+        }
+        .icon {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>تحويل النص إلى جدول Excel</h1>
+        <p class="subtitle">أدخل النص وقم بتحويله إلى جدول Excel مع إمكانية إضافة نصوص متعددة</p>
+        
+        <div class="instructions">
+            <h3>✏️ كيفية الاستخدام:</h3>
+            <ol>
+                <li>الصق النص الطويل في منطقة الإدخال</li>
+                <li>تأكد من أن كل فقرة تتكون من 7 أسطر</li>
+                <li>تأكد من وجود سطر فارغ بين الفقرات</li>
+                <li>انقر على زر "تحويل إلى جدول" لإضافة النص إلى الجدول</li>
+                <li>كرر العملية لإضافة نصوص إضافية</li>
+                <li>انقر على زر "تحميل كملف Excel" لتنزيل الملف</li>
+                <li>استخدم زر "حذف الجدول" لمسح جميع البيانات</li>
+            </ol>
+        </div>
+        
+        <div class="input-section">
+            <h2>أدخل النص هنا:</h2>
+            <textarea id="inputText" placeholder="الصق النص هنا..."></textarea>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                عدد الفقرات المضافة
+                <span id="paragraphsCount" class="stat-number">0</span>
+            </div>
+            <div class="stat-box">
+                عدد الأسطر المضافة
+                <span id="linesCount" class="stat-number">0</span>
+            </div>
+            <div class="stat-box">
+                عدد الصفوف في Excel
+                <span id="rowsCount" class="stat-number">0</span>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button id="convertBtn"><span class="icon">🔄</span> تحويل إلى جدول</button>
+            <button id="clearTextBtn"><span class="icon">🧹</span> مسح النص</button>
+            <button id="downloadBtn"><span class="icon">💾</span> تحميل كملف Excel</button>
+            <button id="clearTableBtn"><span class="icon">🗑️</span> حذف الجدول</button>
+        </div>
+        
+        <div class="output-section">
+            <h2>معاينة الجدول (جميع النصوص المضافة):</h2>
+            <div id="tableContainer"></div>
+        </div>
+        
+        <div class="footer">
+            <p>تم التطوير بواسطة - تطبيق تحويل النص إلى Excel</p>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('inputText');
+            const convertBtn = document.getElementById('convertBtn');
+            const clearTextBtn = document.getElementById('clearTextBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const clearTableBtn = document.getElementById('clearTableBtn');
+            const tableContainer = document.getElementById('tableContainer');
+            const paragraphsCount = document.getElementById('paragraphsCount');
+            const linesCount = document.getElementById('linesCount');
+            const rowsCount = document.getElementById('rowsCount');
+            const notification = document.getElementById('notification');
+            
+            let allTableData = [];
+            let totalLines = 0;
+            let totalParagraphs = 0;
+            
+            // إظهار الإشعار
+            function showNotification(message, isSuccess = true) {
+                notification.textContent = message;
+                notification.style.backgroundColor = isSuccess ? '#4caf50' : '#f44336';
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // تحديث الإحصائيات
+            function updateStats() {
+                const text = inputText.value;
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
+                
+                linesCount.textContent = totalLines;
+                paragraphsCount.textContent = totalParagraphs;
+                rowsCount.textContent = allTableData.length;
+            }
+            
+            // تحويل النص إلى جدول
+            convertBtn.addEventListener('click', function() {
+                const text = inputText.value.trim();
+                if (!text) {
+                    showNotification('يرجى إدخال نص أولاً', false);
+                    return;
+                }
+                
+                // تقسيم النص إلى فقرات
+                const paragraphs = text.split(/\n\s*\n/);
+                const newTableData = [];
+                
+                // معالجة كل فقرة
+                for (let i = 0; i < paragraphs.length; i++) {
+                    const lines = paragraphs[i].split('\n').filter(line => line.trim() !== '');
+                    
+                    if (lines.length !== 7) {
+                        showNotification(`الفقرة ${i+1} لا تحتوي على 7 أسطر. تحتوي على ${lines.length} أسطر.`, false);
+                        return;
+                    }
+                    
+                    newTableData.push(lines);
+                    totalLines += 7;
+                    totalParagraphs++;
+                }
+                
+                // إضافة البيانات الجديدة إلى جميع البيانات
+                allTableData = [...allTableData, ...newTableData];
+                
+                // تحديث الإحصائيات
+                updateStats();
+                
+                // عرض الجدول
+                renderTable(allTableData);
+                
+                // إظهار إشعار النجاح
+                showNotification(`تمت إضافة ${newTableData.length} فقرة بنجاح إلى الجدول`);
+                
+                // مسح نص الإدخال
+                inputText.value = '';
+            });
+            
+            // مسح نص الإدخال
+            clearTextBtn.addEventListener('click', function() {
+                inputText.value = '';
+                showNotification('تم مسح نص الإدخال');
+            });
+            
+            // حذف الجدول بالكامل
+            clearTableBtn.addEventListener('click', function() {
+                if (allTableData.length === 0) {
+                    showNotification('لا يوجد بيانات في الجدول', false);
+                    return;
+                }
+                
+                if (confirm('هل أنت متأكد من أنك تريد حذف الجدول بالكامل؟')) {
+                    allTableData = [];
+                    totalLines = 0;
+                    totalParagraphs = 0;
+                    tableContainer.innerHTML = '';
+                    updateStats();
+                    showNotification('تم حذف الجدول بالكامل');
+                }
+            });
+            
+            // تحميل ملف Excel
+            downloadBtn.addEventListener('click', function() {
+                if (allTableData.length === 0) {
+                    showNotification('لا يوجد بيانات لتحميلها. يرجى تحويل النص إلى جدول أولاً.', false);
+                    return;
+                }
+                
+                // إنشاء مصنف Excel
+                const wb = XLSX.utils.book_new();
+                
+                // تحويل البيانات إلى ورقة عمل
+                const wsData = [];
+                
+                // إضافة الرأس
+                const header = [];
+                for (let i = 1; i <= 7; i++) {
+                    header.push(`العمود ${i}`);
+                }
+                wsData.push(header);
+                
+                // إضافة جميع البيانات
+                allTableData.forEach(row => {
+                    wsData.push(row);
+                });
+                
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // إضافة ورقة العمل إلى المصنف
+                XLSX.utils.book_append_sheet(wb, ws, "البيانات");
+                
+                // إنشاء ملف Excel وتنزيله
+                XLSX.writeFile(wb, "الجدول_المحول.xlsx");
+                
+                showNotification('تم تحميل ملف Excel بنجاح');
+            });
+            
+            // عرض الجدول
+            function renderTable(data) {
+                if (data.length === 0) {
+                    tableContainer.innerHTML = '<p style="text-align: center; color: #777; padding: 20px;">لا توجد بيانات في الجدول</p>';
+                    return;
+                }
+                
+                let tableHTML = '<table>';
+                
+                // إضافة الرأس
+                tableHTML += '<thead><tr>';
+                for (let i = 1; i <= 7; i++) {
+                    tableHTML += `<th>العمود ${i}</th>`;
+                }
+                tableHTML += '</tr></thead>';
+                
+                // إضافة البيانات
+                tableHTML += '<tbody>';
+                data.forEach(row => {
+                    tableHTML += '<tr>';
+                    row.forEach(cell => {
+                        tableHTML += `<td>${cell}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                });
+                tableHTML += '</tbody></table>';
+                
+                tableContainer.innerHTML = tableHTML;
+            }
+            
+            // تحديث الإحصائيات عند الكتابة
+            inputText.addEventListener('input', function() {
+                const text = inputText.value;
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim() !== '');
+                
+                linesCount.textContent = totalLines + lines.length;
+                paragraphsCount.textContent = totalParagraphs + paragraphs.length;
+                rowsCount.textContent = allTableData.length + paragraphs.length;
+            });
+            
+            // إضافة نص كمثال للمستخدم
+            inputText.value = "هذا هو السطر الأول من الفقرة الأولى\nهذا هو السطر الثاني\nالسطر الثالث من الفقرة الأولى\nالسطر الرابع من النص\nالسطر الخامس من النص المثال\nالسطر السادس من النص\nالسطر السابع والأخير من الفقرة الأولى\n\nهذا هو السطر الأول من الفقرة الثانية\nهذا هو السطر الثاني من الفقرة الثانية\nالسطر الثالث من الفقرة الثانية\nالسطر الرابع من الفقرة الثانية\nالسطر الخامس من الفقرة الثانية\nالسطر السادس من الفقرة الثانية\nالسطر السابع والأخير من الفقرة الثانية";
+            
+            // تحديث الإحصائيات الأولية
+            updateStats();
+            
+            // عرض الجدول الفارغ
+            renderTable(allTableData);
+        });
+    </script>
+</body>
+</html>
