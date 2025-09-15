@@ -1,168 +1,104 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WAY</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-/* ... كل CSS كما في النسخة السابقة مع تكبير الأزرار ... */
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAY</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-size: 16px;
+            background: #e0e0e0;
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+        header {
+            background: #2e7d52;
+            color: white;
+            padding: 18px 10px 18px 10px;
+            text-align: center;
+        }
+        .header-icon {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 42px;
+            filter: drop-shadow(0 4px 12px #ffd70099);
+        }
+        h1 { font-size: 27px; margin-bottom: 3px; font-weight: bold;}
+        
+        /* ✅ تكبير الأزرار */
+        .nav-btn {
+            padding: 14px 28px;    /* أكبر */
+            font-size: 16px;       /* تكبير النص */
+            min-width: 100px;      /* عرض أدنى */
+            background: #2e7d52;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover:not(:disabled) {
+            background: #1e5e3b;
+            transform: translateY(-2px);
+        }
+        .show-featured-btn {
+            padding: 12px 20px;
+            font-size: 15px;
+            background: #fffbe6;
+            color: #d58500;
+            border: 1px solid #ffb300;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .show-featured-btn i {
+            font-size: 15px;
+            margin-left: 5px;
+        }
+        .home-btn {
+            font-size: 2rem; /* تكبير أيقونة الرئيسية */
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            color: #2e7d52;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .home-btn:hover {
+            background: #e3f2fd;
+            border-radius: 50%;
+        }
+    </style>
 </head>
 <body>
-<audio id="click-audio" src="https://cdn.pixabay.com/audio/2022/11/16/audio_12bfa6f1e1.mp3"></audio>
-<div class="container">
-  <header><h1>WAY</h1></header>
-  <div class="loading" id="loading"><i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات الاختبار...</div>
-
-  <div class="subject-selection" id="subject-section" style="display: none;">
-    <h2>اختر المادة:</h2>
-    <div class="selection-container">
-      <select id="subject-select"></select>
-      <div class="column10-info" id="column10-info"></div>
+    <div class="container">
+        <header>
+            <h1>WAY</h1>
+        </header>
+        <div class="navigation-bar-fixed-top">
+            <button class="nav-btn">السابق</button>
+            <button class="nav-btn">التالي</button>
+            <button class="show-featured-btn"><i class="fa-regular fa-star"></i> عرض المميزة</button>
+            <button class="home-btn"><i class="fas fa-home"></i></button>
+        </div>
     </div>
-    <button class="start-btn" id="start-btn">بدء الاختبار</button>
-  </div>
-
-  <div class="exam-section" id="exam-section">
-    <div class="subject-name" id="subject-name"></div>
-    <div class="progress-text">السؤال <span id="current-q">1</span> من <span id="total-qs">0</span></div>
-    <div class="progress-slider-bar">
-      <div class="slider-labels left"><span>1</span></div>
-      <input type="range" min="1" max="10" value="10" class="slider" id="question-slider">
-      <div class="slider-labels right"><span id="max-question">10</span></div>
-    </div>
-    <div class="navigation-bar-fixed-top" id="nav-top-bar">
-      <button class="nav-btn" id="prev-btn" disabled>السابق</button>
-      <button class="nav-btn" id="next-btn">التالي</button>
-      <button class="show-featured-btn" id="show-featured-btn" title="عرض المميزة"><i class="fa-regular fa-star"></i> عرض المميزة</button>
-      <button class="home-btn" id="nav-home-btn" title="الصفحة الرئيسية"><i class="fas fa-home"></i></button>
-    </div>
-    <div class="question-container" id="question-container">
-      <div class="question-header-bar">
-        <button class="star-btn" id="star-btn" title="تمييز السؤال"><i class="fa-regular fa-star"></i></button>
-        <div class="question-text" id="question-text"></div>
-      </div>
-      <div class="options-container" id="options-container"></div>
-    </div>
-    <button class="bottom-back-btn" id="bottom-back-btn" style="display:none"><i class="fas fa-home"></i> العودة للبداية</button>
-  </div>
-
-  <div class="results-section" id="results-section">
-    <h2>لقد أكملت الاختبار!</h2>
-    <p>درجتك النهائية هي:</p>
-    <div class="score" id="score">0/0</div>
-    <button class="restart-btn" id="restart-btn">إعادة الاختبار</button>
-    <button class="bottom-back-btn" id="results-back-btn"><i class="fas fa-home"></i> العودة للبداية</button>
-  </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const loadingElement = document.getElementById('loading');
-  const subjectSection = document.getElementById('subject-section');
-  const subjectSelect = document.getElementById('subject-select');
-  const column10Info = document.getElementById('column10-info');
-  const startBtn = document.getElementById('start-btn');
-  const examSection = document.getElementById('exam-section');
-  const subjectNameElement = document.getElementById('subject-name');
-  const resultsSection = document.getElementById('results-section');
-  const questionText = document.getElementById('question-text');
-  const optionsContainer = document.getElementById('options-container');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-  const currentQ = document.getElementById('current-q');
-  const totalQs = document.getElementById('total-qs');
-  const scoreElement = document.getElementById('score');
-  const restartBtn = document.getElementById('restart-btn');
-  const bottomBackBtn = document.getElementById('bottom-back-btn');
-  const resultsBackBtn = document.getElementById('results-back-btn');
-  const questionSlider = document.getElementById('question-slider');
-  const maxQuestionLabel = document.getElementById('max-question');
-  const starBtn = document.getElementById('star-btn');
-  const showFeaturedBtn = document.getElementById('show-featured-btn');
-  const navHomeBtn = document.getElementById('nav-home-btn');
-  const questionContainer = document.getElementById('question-container');
-  const clickAudio = document.getElementById('click-audio');
-
-  let questionsData = [];
-  let currentSubject = '';
-  let currentQuestions = [];
-  let currentQuestionIndex = 0;
-  let userAnswers = [];
-  let starredQuestions = [];
-  let subjectColumn10 = {};
-  let showOnlyStarred = false;
-
-  const excelFileURL = "./MCQ5.xlsx"; // تحميل الملف محليًا
-
-  function getStarStorageKey(subject) { return `starredQuestions_${subject}`; }
-  function loadStarredQuestions(subject) {
-    try { starredQuestions = JSON.parse(localStorage.getItem(getStarStorageKey(subject))) || []; }
-    catch(e){ starredQuestions = []; }
-  }
-  function saveStarredQuestions(subject) { localStorage.setItem(getStarStorageKey(subject), JSON.stringify(starredQuestions)); }
-
-  // تحميل الملف المحلي
-  loadExcelFile(excelFileURL);
-
-  function loadExcelFile(url) {
-    loadingElement.style.display = 'block';
-    fetch(url)
-      .then(response => {
-        if (!response.ok) throw new Error(`فشل التحميل: ${response.status}`);
-        return response.arrayBuffer();
-      })
-      .then(data => { processExcelData(data); loadingElement.style.display='none'; subjectSection.style.display='block'; })
-      .catch(error => { console.error('Error:', error); loadingElement.innerHTML = `<p style="color:red;">فشل تحميل ملف Excel. تأكد من وجود الملف في نفس المجلد.</p>`; });
-  }
-
-  function processExcelData(data) {
-    const workbook = XLSX.read(data, { type: 'array' });
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-    questionsData = [];
-    const subjects = new Set();
-    subjectColumn10 = {};
-    const startRow = jsonData[0].length > 0 && isNaN(jsonData[0][0]) ? 1 : 0;
-
-    for (let i = startRow; i < jsonData.length; i++) {
-      const row = jsonData[i];
-      if (!row || row.length < 7) continue;
-      const question = { text: row[0] || 'بدون نص', options: [], correctAnswer: parseInt(row[6]) || 1, subject: row[8] || 'عام', id: i };
-      for (let j=1;j<=5;j++){ if(row[j]) question.options.push(row[j]); }
-      if(question.options.length===0){ question.options.push('نعم'); question.options.push('لا'); }
-      questionsData.push(question); subjects.add(question.subject);
-      if(row[9] && !subjectColumn10[question.subject]) subjectColumn10[question.subject]=row[9];
-    }
-
-    subjectSelect.innerHTML='';
-    subjects.forEach(sub => { const option=document.createElement('option'); option.value=sub; option.textContent=sub; subjectSelect.appendChild(option); });
-    currentSubject = subjectSelect.value; updateColumn10Info(); loadStarredQuestions(currentSubject);
-  }
-
-  function updateColumn10Info(){ column10Info.textContent = subjectColumn10[currentSubject] || 'لا توجد معلومات إضافية'; }
-
-  subjectSelect.addEventListener('change', function(){ currentSubject=this.value; updateColumn10Info(); loadStarredQuestions(currentSubject); });
-
-  startBtn.addEventListener('click', function(){
-    currentSubject = subjectSelect.value;
-    currentQuestions = questionsData.filter(q => q.subject===currentSubject);
-    if(currentQuestions.length===0){ alert('لا توجد أسئلة لهذه المادة'); return; }
-    userAnswers = new Array(currentQuestions.length).fill(null);
-    loadStarredQuestions(currentSubject);
-    currentQuestionIndex=0; showOnlyStarred=false;
-    showFeaturedBtn.classList.remove('active'); showFeaturedBtn.innerHTML='<i class="fa-regular fa-star"></i> عرض المميزة';
-    totalQs.textContent=currentQuestions.length; subjectNameElement.textContent=currentSubject;
-    maxQuestionLabel.textContent=currentQuestions.length; questionSlider.max=currentQuestions.length; questionSlider.value=currentQuestions.length;
-    updateProgressAndSlider(); updateStarButton(); showQuestion();
-    subjectSection.style.display='none'; examSection.style.display='block';
-  });
-
-  // ... باقي الكود كما في النسخة السابقة بدون تعديل كبير ...
-
-});
-</script>
 </body>
 </html>
