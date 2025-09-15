@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            font-size: 24px; /* 16px × 150% ≈ 24px */
+            font-size: 24px;
             background: #e0e0e0;
             color: #333;
             min-height: 100vh;
@@ -40,10 +40,10 @@
         #prev-btn,
         #next-btn,
         #show-featured-btn {
-            font-size: 28px;       /* تكبير الخط */
-            padding: 12px 24px;    /* تكبير مساحة الزر */
-            border-radius: 10px;   /* زوايا مستديرة */
-            cursor: pointer;       /* مؤشر اليد */
+            font-size: 28px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
             transition: transform 0.2s;
         }
 
@@ -59,6 +59,24 @@
         #show-featured-btn {
             background-color: #ffeb3b;
             border: 1px solid #fbc02d;
+        }
+
+        /* زر النجمة داخل السؤال */
+        #star-btn {
+            font-size: 28px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+        /* تأثير عند المرور على زر النجمة */
+        #star-btn:hover {
+            transform: scale(1.2);
+            background-color: #ffeb3b;
+            border-color: #fbc02d;
         }
     </style>
 </head>
