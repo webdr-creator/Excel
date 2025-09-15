@@ -36,7 +36,7 @@
         .progress-text { font-size: 18px; }
         .score { font-size: 48px; }
 
-        /* تكبير أزرار السابق، التالي، والمميزة */
+        /* تكبير أزرار التالي، السابق، المميزة */
         #prev-btn,
         #next-btn,
         #show-featured-btn {
@@ -47,7 +47,6 @@
             transition: transform 0.2s;
         }
 
-        /* تأثير عند المرور على الزر */
         #prev-btn:hover,
         #next-btn:hover,
         #show-featured-btn:hover {
@@ -55,7 +54,6 @@
             background-color: #f0f0f0;
         }
 
-        /* تمييز زر المميزة بلون أصفر */
         #show-featured-btn {
             background-color: #ffeb3b;
             border: 1px solid #fbc02d;
@@ -72,11 +70,28 @@
             border: 1px solid #ccc;
         }
 
-        /* تأثير عند المرور على زر النجمة */
         #star-btn:hover {
             transform: scale(1.2);
             background-color: #ffeb3b;
             border-color: #fbc02d;
+        }
+
+        /* تكبير أزرار العودة للبداية وإعادة الاختبار */
+        .bottom-back-btn,
+        .restart-btn {
+            font-size: 28px;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+        .bottom-back-btn:hover,
+        .restart-btn:hover {
+            transform: scale(1.1);
+            background-color: #f0f0f0;
         }
     </style>
 </head>
