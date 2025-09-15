@@ -12,29 +12,54 @@
             background: #e0e0e0;
             color: #333;
             min-height: 100vh;
-            margin: 0; /* إزالة الهوامش */
+            margin: 0;
             display: flex;
             flex-direction: column;
         }
         .container {
             width: 100%;
-            height: 100vh;  /* ملء الشاشة بالكامل */
-            max-width: none; /* إلغاء الحد الأقصى */
+            height: 100vh;
+            max-width: none;
             background: white;
-            border-radius: 0; /* إزالة الزوايا */
-            box-shadow: none; /* إزالة الظل */
+            border-radius: 0;
+            box-shadow: none;
             overflow: auto;
             margin: 0;
             position: relative;
             display: flex;
             flex-direction: column;
         }
-        h1 { font-size: 40px; } /* تكبير العنوان */
+        h1 { font-size: 40px; }
         .question-text { font-size: 22px; }
         .option { font-size: 20px; }
         .nav-btn, .start-btn, .restart-btn, .bottom-back-btn { font-size: 20px; }
         .progress-text { font-size: 18px; }
         .score { font-size: 48px; }
+
+        /* تكبير أزرار السابق، التالي، والمميزة */
+        #prev-btn,
+        #next-btn,
+        #show-featured-btn {
+            font-size: 28px;       /* تكبير الخط */
+            padding: 12px 24px;    /* تكبير مساحة الزر */
+            border-radius: 10px;   /* زوايا مستديرة */
+            cursor: pointer;       /* مؤشر اليد */
+            transition: transform 0.2s;
+        }
+
+        /* تأثير عند المرور على الزر */
+        #prev-btn:hover,
+        #next-btn:hover,
+        #show-featured-btn:hover {
+            transform: scale(1.1);
+            background-color: #f0f0f0;
+        }
+
+        /* تمييز زر المميزة بلون أصفر */
+        #show-featured-btn {
+            background-color: #ffeb3b;
+            border: 1px solid #fbc02d;
+        }
     </style>
 </head>
 <body>
@@ -91,7 +116,6 @@
         </button>
     </div>
 </div>
-<!-- رابط السكربت الأصلي -->
 <script src="https://cdn.jsdelivr.net/gh/webdr-creator/Excel/test-script.js"></script>
 </body>
 </html>
