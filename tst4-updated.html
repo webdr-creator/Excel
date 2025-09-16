@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAY (معدل)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --base-font-size: 24px; }
+        html, body { height: 100%; }
+        body { font-size: var(--base-font-size); background: #e0e0e0; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; direction: rtl; }
+        .container { width: calc(100% - 40px); height: calc(100vh - 40px); background: white; border-radius: 14px; box-shadow: 0 14px 40px rgba(0,0,0,0.25); overflow: auto; margin: 0; position: relative; display: flex; flex-direction: column; }
+        header { background: #2e7d52; color: white; padding: 26px 16px; text-align: center; flex: 0 0 auto; }
+        h1 { font-size: 36px; margin-bottom: 3px; font-weight: bold;}
+        .content-wrap { padding: 20px 26px 40px 26px; flex: 1 1 auto; overflow: auto; }
+
+        .star-btn { background: none; border: none; font-size: 30px; color: #ccc; cursor: pointer; transition: all 0.3s; margin: 0 0 0 8px; padding:0; order: 2; }
+        /* ⭐️ عند تمييز السؤال تصبح النجمة ذهبية */
+        .star-btn.starred { color: #ffd700; }
+
+        .show-featured-btn { padding: 10px 16px; font-size: 16px; background: #fffbe6; color: #d58500; border: 1px solid #ffb300; border-radius: 10px; cursor: pointer; font-weight: 600; }
+
+        /* تجاوب على الشاشات الصغيرة */
+        @media (max-width: 600px) { :root { --base-font-size: 20px; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><h1>WAY</h1></header>
+    <div class="content-wrap">
+        <div class="question-container">
+            <div class="question-header-bar">
+                <button class="star-btn" id="star-btn" title="تمييز السؤال">
+                    <i class="fa-regular fa-star"></i>
+                </button>
+                <div class="question-text">نص السؤال هنا</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const starBtn = document.getElementById('star-btn');
+    starBtn.addEventListener('click', function() {
+        const starIcon = this.querySelector('i');
+        this.classList.toggle('starred');
+        if (this.classList.contains('starred')) {
+            starIcon.classList.remove('fa-regular');
+            starIcon.classList.add('fa-solid');
+        } else {
+            starIcon.classList.remove('fa-solid');
+            starIcon.classList.add('fa-regular');
+        }
+    });
+});
+</script>
+</body>
+</html>
