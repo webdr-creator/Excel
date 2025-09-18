@@ -381,6 +381,34 @@
     border-radius: 50%;
 }
 
+/* تعديلات جديدة لزر التالي */
+.navigation-bar-fixed-top {
+    justify-content: space-between; /* توزيع العناصر بالتساوي */
+    padding: 7px 15px; /* زيادة المساحة على الجوانب */
+}
+
+#prev-btn {
+    order: 3; /* وضع زر السابق على اليمين */
+    margin-right: auto; /* دفع العناصر الأخرى لليسار */
+}
+
+#next-btn {
+    order: 1; /* وضع زر التالي على اليسار */
+    margin-left: auto; /* دفع العناصر الأخرى لليمين */
+}
+
+#show-featured-btn {
+    order: 2; /* وضع زر عرض المميزة في المنتصف */
+}
+
+#solve-mode-btn {
+    order: 4; /* وضع زر إظهار الحلول بعد زر السابق */
+}
+
+#nav-home-btn {
+    order: 5; /* وضع زر الصفحة الرئيسية في النهاية */
+}
+
 </style>
 </head>
 <body>
@@ -410,10 +438,10 @@
 <div class="slider-labels right"><span id="max-question">10</span></div>
 </div>
 <div class="navigation-bar-fixed-top" id="nav-top-bar">
-<button class="nav-btn" disabled="" id="prev-btn">السابق</button>
-<button class="nav-btn" id="next-btn">التالي</button>
+<button class="nav-btn" id="next-btn"><i class="fas fa-arrow-left"></i></button>
 <button class="show-featured-btn" id="show-featured-btn" title="عرض المميزة"><i class="fa-regular fa-star"></i> عرض المميزة</button>
 <button class="solve-mode-btn" id="solve-mode-btn" title="إظهار الحلول"><i class="fa-solid fa-check-double"></i></button>
+<button class="nav-btn" disabled="" id="prev-btn"><i class="fas fa-arrow-right"></i></button>
 <button class="home-btn" id="nav-home-btn" title="الصفحة الرئيسية"><i class="fas fa-home"></i></button>
 </div>
 <div class="question-container" id="question-container">
@@ -832,259 +860,200 @@ function getDisplayedQuestions() {
 
         // حساب الإجابة الصحيحة
         let correctIdx = question.correctAnswer - 1;
-        let userSelectedIdx = isAnswered ? userAnswers[originalIndex] - 1 : -1;
-        // إظهار الخيارات وتلوينها
+        if (correctIdx < 0) correctIdx = 0;
+        if (correctIdx >= question.options.length) correctIdx = question.options.length - 1;
+
+        // إذا كان solveMode مفعلًا، نظهر الإجابة الصحيحة مباشرة
+        if (solveMode) {
+            isAnswered = true;
+            userAnswers[originalIndex] = correctIdx + 1;
+        }
+
         question.options.forEach((option, index) => {
             const optionElement = document.createElement('div');
             optionElement.className = 'option';
             optionElement.textContent = option;
+            optionElement.dataset.index = index + 1;
             if (isAnswered) {
-                // الإجابة الصحيحة
                 if (index === correctIdx) {
-                    // إذا أجاب خطأ، أبرز الصحيحة حتى لو لم يضغط عليها
-                    if (userSelectedIdx !== correctIdx) {
-                        optionElement.classList.add('correct');
-                    }
-                }
-                // إجابة المستخدم
-                if (userSelectedIdx === index) {
-                    if (userSelectedIdx === correctIdx) {
-                        optionElement.classList.add('correct');
-                    } else {
-                        optionElement.classList.add('incorrect');
-                    }
+                    optionElement.classList.add('correct');
+                } else if (userAnswers[originalIndex] === index + 1) {
+                    optionElement.classList.add('incorrect');
                 }
             }
-            optionElement.addEventListener('click', () => selectOption(index + 1, question.id));
-            if (solveMode && index === correctIdx) {
-                optionElement.classList.add('correct');
+            if (!isAnswered) {
+                optionElement.addEventListener('click', function() {
+                    selectOption(this);
+                });
             }
             optionsContainer.appendChild(optionElement);
         });
-        for (let i = question.options.length; i < 5; i++) {
-            let filler = document.createElement('div');
-            filler.className = 'option';
-            filler.style.visibility = 'hidden';
-            filler.innerHTML = '&nbsp;';
-            optionsContainer.appendChild(filler);
-        }
-        // زر الشرح
+
+        // إظهار أو إخفاء الشرح
+        const explanationElement = document.getElementById('question-explanation');
         const infoBtn = document.getElementById('info-btn');
-        const explanationDiv = document.getElementById('question-explanation');
-        if (question.explanation) {
-            infoBtn.style.display = 'inline-block';
-            infoBtn.onclick = () => {
-                explanationDiv.style.display = (explanationDiv.style.display === 'none') ? 'block' : 'none';
-                explanationDiv.textContent = question.explanation;
-            };
+        if (question.explanation && question.explanation.trim() !== '') {
+            explanationElement.textContent = question.explanation;
+            explanationElement.style.display = isAnswered ? 'block' : 'none';
+            infoBtn.style.display = 'block';
         } else {
+            explanationElement.style.display = 'none';
             infoBtn.style.display = 'none';
-            explanationDiv.style.display = 'none';
         }
 
-
-        // زر إظهار الإجابة الصحيحة
-        const showAnswerBtn = document.getElementById('show-answer-btn');
-        if (showAnswerBtn) {
-            showAnswerBtn.onclick = () => {
-                const options = optionsContainer.querySelectorAll('.option');
-                options.forEach((opt, idx) => {
-                    if (idx === correctIdx) {
-                        opt.classList.add('correct');
-                    }
-                });
-            };
-        }
-
-        // تحديث مؤشر السؤال الحالي
-        currentQ.textContent = currentQuestionIndex + 1;
-        totalQs.textContent = displayedQuestions.length;
-
-        // السلايدر
-        questionSlider.max = displayedQuestions.length;
-        questionSlider.value = currentQuestionIndex + 1;
         updateNavigationButtons();
-        updateStarButton();
         updateProgressAndSlider();
+        updateStarButton();
     }
 
-    function selectOption(optionIndex, questionId) {
-        document.getElementById('question-explanation').style.display = 'none';
-        const originalIndex = currentQuestions.findIndex(q => q.id === questionId);
-        if (userAnswers[originalIndex] !== null) return;
-        playClick();
-        userAnswers[originalIndex] = optionIndex;
+    function selectOption(optionElement) {
         const displayedQuestions = getDisplayedQuestions();
         const question = displayedQuestions[currentQuestionIndex];
-        const correctIdx = question.correctAnswer - 1;
+        const originalIndex = currentQuestions.findIndex(q => q.id === question.id);
+        const selectedOption = parseInt(optionElement.dataset.index);
+        userAnswers[originalIndex] = selectedOption;
+        const correctAnswer = question.correctAnswer;
         const options = optionsContainer.querySelectorAll('.option');
-        let isCorrect = optionIndex === question.correctAnswer;
-        let isIncorrect = !isCorrect;
-        questionContainer.classList.remove('correct','incorrect');
-
-        options.forEach((opt, idx) => {
-            // إذا المستخدم اختار هذا الخيار
-            if (optionIndex - 1 === idx) {
-                if (isCorrect) {
-                    opt.classList.add('correct');
-                } else {
-                    opt.classList.add('incorrect');
-                    opt.classList.add('shake');
-                    setTimeout(() => opt.classList.remove('shake'), 500);
-                }
-            }
-            // إذا هذا هو الخيار الصحيح ولم يتم الضغط عليه
-            if (isIncorrect && idx === correctIdx) {
+        options.forEach(opt => {
+            opt.classList.remove('correct', 'incorrect');
+            if (parseInt(opt.dataset.index) === correctAnswer) {
                 opt.classList.add('correct');
             }
+            if (parseInt(opt.dataset.index) === selectedOption && selectedOption !== correctAnswer) {
+                opt.classList.add('incorrect');
+            }
         });
-
-        if (isIncorrect) {
-            options[optionIndex - 1].classList.add('shake');
-            setTimeout(() => options[optionIndex - 1].classList.remove('shake'), 500);
+        if (selectedOption !== correctAnswer) {
+            questionContainer.classList.add('shake');
             setTimeout(() => {
-                if (currentQuestionIndex < displayedQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    showQuestion();
-                    updateProgressAndSlider();
-                }
-            }, 1500);
-        } else {
-            setTimeout(() => {
-                if (currentQuestionIndex < displayedQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    showQuestion();
-                    updateProgressAndSlider();
-                } else {
-                    showResults();
-                }
-            }, 900);
+                questionContainer.classList.remove('shake');
+            }, 500);
+        }
+        const explanationElement = document.getElementById('question-explanation');
+        if (question.explanation && question.explanation.trim() !== '') {
+            explanationElement.style.display = 'block';
         }
         updateNavigationButtons();
+        try {
+            clickAudio.play();
+        } catch (e) {
+            console.log("لم يتمكن من تشغيل الصوت");
+        }
+    }
+
+    function updateProgressAndSlider() {
+        const displayedQuestions = getDisplayedQuestions();
+        if (displayedQuestions.length === 0) {
+            currentQ.textContent = 0;
+            totalQs.textContent = 0;
+            questionSlider.max = 1;
+            questionSlider.value = 1;
+            return;
+        }
+        currentQ.textContent = currentQuestionIndex + 1;
+        totalQs.textContent = displayedQuestions.length;
+        questionSlider.max = displayedQuestions.length;
+        questionSlider.value = currentQuestionIndex + 1;
+        const progressPercentage = ((currentQuestionIndex + 1) / displayedQuestions.length) * 100;
+        questionSlider.style.setProperty('--progress', progressPercentage + '%');
     }
 
     function updateNavigationButtons() {
-        const displayed = getDisplayedQuestions();
-        prevBtn.disabled = currentQuestionIndex === 0 || displayed.length === 0;
-        nextBtn.disabled = displayed.length === 0;
-        if (currentQuestionIndex === displayed.length - 1) {
-            nextBtn.textContent = 'إنهاء الاختبار';
-        } else {
-            nextBtn.textContent = 'التالي';
+        const displayedQuestions = getDisplayedQuestions();
+        prevBtn.disabled = currentQuestionIndex === 0;
+        if (displayedQuestions.length === 0) {
+            nextBtn.disabled = true;
+            return;
         }
+        const originalIndex = currentQuestions.findIndex(q => q.id === displayedQuestions[currentQuestionIndex].id);
+        nextBtn.disabled = currentQuestionIndex === displayedQuestions.length - 1 && userAnswers[originalIndex] === null;
     }
+
     prevBtn.addEventListener('click', function() {
-        document.getElementById('question-explanation').style.display = 'none';
-        const displayed = getDisplayedQuestions();
-        if (currentQuestionIndex > 0 && displayed.length > 0) {
+        if (currentQuestionIndex > 0) {
             currentQuestionIndex--;
             showQuestion();
             updateProgressAndSlider();
-            updateNavigationButtons();
+            updateStarButton();
         }
     });
+
     nextBtn.addEventListener('click', function() {
-        document.getElementById('question-explanation').style.display = 'none';
-        const displayed = getDisplayedQuestions();
-        if (currentQuestionIndex < displayed.length - 1) {
+        const displayedQuestions = getDisplayedQuestions();
+        if (displayedQuestions.length === 0) return;
+        const originalIndex = currentQuestions.findIndex(q => q.id === displayedQuestions[currentQuestionIndex].id);
+        if (userAnswers[originalIndex] === null) {
+            alert('يرجى اختيار إجابة للمتابعة');
+            return;
+        }
+        if (currentQuestionIndex < displayedQuestions.length - 1) {
             currentQuestionIndex++;
             showQuestion();
             updateProgressAndSlider();
-            updateNavigationButtons();
+            updateStarButton();
         } else {
-            showResults();
+            finishExam();
         }
     });
-    function updateProgressAndSlider() {
-        const displayedQuestions = getDisplayedQuestions();
-        let percent = 0;
-        if (displayedQuestions.length > 0)
-            percent = 100 - ((currentQuestionIndex + 1) / displayedQuestions.length) * 100;
-        questionSlider.max = displayedQuestions.length;
-        questionSlider.value = currentQuestionIndex + 1;
-        maxQuestionLabel.textContent = displayedQuestions.length;
-        // progress line removed
-    }
-    function showResults() {
-        let correct = 0;
-        for (let i = 0; i < currentQuestions.length; i++) {
-            if (userAnswers[i] === currentQuestions[i].correctAnswer)
-                correct++;
-        }
-        scoreElement.textContent = `${correct}/${currentQuestions.length}`;
+
+    function finishExam() {
+        let correctCount = 0;
+        userAnswers.forEach((answer, index) => {
+            if (answer === currentQuestions[index].correctAnswer) {
+                correctCount++;
+            }
+        });
+        scoreElement.textContent = `${correctCount}/${userAnswers.length}`;
         examSection.style.display = 'none';
         resultsSection.style.display = 'block';
     }
-    re
-startBtn.addEventListener('click', function() {
-    currentSubject = subjectSelect.value;
-    let col10Val = document.getElementById('column10-info').value;
-    let col11Val = document.getElementById('column11-select').value;
 
-    // تحقق من اختيار الفصل (col10)
-    if (!col10Val || col10Val === "") {
-        showError("اختر فصل");
-        return;
-    }
+    restartBtn.addEventListener('click', function() {
+        userAnswers = new Array(currentQuestions.length).fill(null);
+        currentQuestionIndex = 0;
+        showOnlyStarred = false;
+        showFeaturedBtn.classList.remove('active');
+        showFeaturedBtn.innerHTML = '<i class="fa-regular fa-star"></i> عرض المميزة';
+        showQuestion();
+        updateProgressAndSlider();
+        updateStarButton();
+        resultsSection.style.display = 'none';
+        examSection.style.display = 'block';
+    });
 
-    currentQuestions = questionsData.filter(q => q.subject === currentSubject);
-    if (col10Val) currentQuestions = currentQuestions.filter(q => q.col10 === col10Val);
-    if (col11Val && col11Val !== 'الكل') currentQuestions = currentQuestions.filter(q => q.col11 === col11Val);
-    if (currentQuestions.length === 0) {
-        showError("لا توجد أسئلة لهذه المادة");
-        return;
-    }
-
-    userAnswers = new Array(currentQuestions.length).fill(null);
-    loadStarredQuestions(currentSubject);
-    currentQuestionIndex = 0;
-    showOnlyStarred = false;
-    showFeaturedBtn.classList.remove('active');
-    showFeaturedBtn.innerHTML = '<i class="fa-regular fa-star"></i> عرض المميزة';
-    totalQs.textContent = currentQuestions.length;
-    subjectNameElement.textContent = currentSubject;
-    maxQuestionLabel.textContent = currentQuestions.length;
-    questionSlider.max = currentQuestions.length;
-    questionSlider.value = currentQuestions.length;
-    updateProgressAndSlider();
-    updateStarButton();
-    showQuestion();
-    subjectSection.style.display = 'none';
-    examSection.style.display = 'block';
-});
-
-// دالة لإظهار إشعار خطأ
-function showError(msg) {
-    const notification = document.createElement("div");
-    notification.textContent = msg;
-    notification.style.position = "fixed";
-    notification.style.top = "20px";
-    notification.style.right = "20px";
-    notification.style.background = "#f44336";
-    notification.style.color = "white";
-    notification.style.padding = "10px 15px";
-    notification.style.borderRadius = "6px";
-    notification.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
-    notification.style.zIndex = "9999";
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
-}
-bottomBackBtn.addEventListener('click', function() {
+    bottomBackBtn.addEventListener('click', function() {
         subjectSection.style.display = 'block';
         examSection.style.display = 'none';
-        resultsSection.style.display = 'none';
     });
+
     resultsBackBtn.addEventListener('click', function() {
         subjectSection.style.display = 'block';
-        examSection.style.display = 'none';
         resultsSection.style.display = 'none';
     });
-    function playClick() {
-        if (clickAudio) {
-            clickAudio.currentTime = 0;
-            clickAudio.play();
-        }
-    }
+
+    // زر إظهار الشرح
+    document.getElementById('info-btn').addEventListener('click', function() {
+        const explanation = document.getElementById('question-explanation');
+        explanation.style.display = explanation.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // زر إظهار الإجابة الصحيحة
+    document.getElementById('show-answer-btn').addEventListener('click', function() {
+        const displayedQuestions = getDisplayedQuestions();
+        if (displayedQuestions.length === 0) return;
+        const question = displayedQuestions[currentQuestionIndex];
+        const correctAnswer = question.correctAnswer;
+        const options = optionsContainer.querySelectorAll('.option');
+        options.forEach(opt => {
+            opt.classList.remove('correct', 'incorrect');
+            if (parseInt(opt.dataset.index) === correctAnswer) {
+                opt.classList.add('correct');
+            }
+        });
+        const originalIndex = currentQuestions.findIndex(q => q.id === question.id);
+        userAnswers[originalIndex] = correctAnswer;
+        updateNavigationButtons();
+    });
 });
 </script>
 </body>
