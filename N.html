@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر ملف Excel</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .auth-section {
+            background-color: var(--light-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .editor-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .file-info {
+            background-color: var(--light-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .editor-toolbar {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .editor-content {
+            min-height: 400px;
+            padding: 15px;
+            outline: none;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .editor-toolbar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>محرر ملف Excel على GitHub</h1>
+            <p class="description">هذه الأداة تسمح لك بتعديل ملف Excel الموجود في مستودع GitHub الخاص بك</p>
+        </header>
+        
+        <section class="auth-section">
+            <h2>معلومات المصادقة</h2>
+            <p>للتعديل على الملف، تحتاج إلى توفير رمز الوصول الشخصي (Personal Access Token) من GitHub</p>
+            
+            <div class="form-group">
+                <label for="github-token">رمز الوصول الشخصي (GitHub Personal Access Token)</label>
+                <input type="password" id="github-token" placeholder="أدخل رمز الوصول الشخصي">
+                <small>يجب أن يحتوي الرمز على أذونات repo للوصول الكامل إلى المستودعات</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="repo-owner">مالك المستودع (Repository Owner)</label>
+                <input type="text" id="repo-owner" placeholder="اسم المستخدم أو المنظمة">
+            </div>
+            
+            <div class="form-group">
+                <label for="repo-name">اسم المستودع (Repository Name)</label>
+                <input type="text" id="repo-name" placeholder="اسم المستودع">
+            </div>
+            
+            <div class="form-group">
+                <label for="file-path">مسار الملف داخل المستودع</label>
+                <input type="text" id="file-path" value="Excel/MCQD.XLSX" placeholder="مسار الملف">
+            </div>
+            
+            <button id="load-file-btn">تحميل الملف</button>
+        </section>
+        
+        <div class="loading" id="loading-indicator">
+            <div class="spinner"></div>
+            <p>جاري تحميل البيانات...</p>
+        </div>
+        
+        <section class="editor-section" id="editor-section">
+            <div class="file-info">
+                <h3>معلومات الملف</h3>
+                <p id="file-info-text"></p>
+            </div>
+            
+            <div class="editor-container">
+                <div class="editor-toolbar">
+                    <button id="save-btn">حفظ التغييرات</button>
+                    <button id="download-btn">تحميل الملف</button>
+                    <button id="reset-btn">إعادة تعيين</button>
+                </div>
+                <div class="editor-content" id="editor" contenteditable="true">
+                    <!-- سيتم تحميل محتوى الملف هنا -->
+                </div>
+            </div>
+            
+            <div class="status-message" id="status-message"></div>
+        </section>
+    </div>
+
+    <script>
+        // عناصر DOM
+        const githubTokenInput = document.getElementById('github-token');
+        const repoOwnerInput = document.getElementById('repo-owner');
+        const repoNameInput = document.getElementById('repo-name');
+        const filePathInput = document.getElementById('file-path');
+        const loadFileBtn = document.getElementById('load-file-btn');
+        const editorSection = document.getElementById('editor-section');
+        const editor = document.getElementById('editor');
+        const saveBtn = document.getElementById('save-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const statusMessage = document.getElementById('status-message');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const fileInfoText = document.getElementById('file-info-text');
+        
+        // متغيرات التطبيق
+        let originalContent = '';
+        let fileSha = '';
+        
+        // حدث تحميل الملف
+        loadFileBtn.addEventListener('click', async () => {
+            const token = githubTokenInput.value.trim();
+            const owner = repoOwnerInput.value.trim();
+            const repo = repoNameInput.value.trim();
+            const path = filePathInput.value.trim();
+            
+            if (!token || !owner || !repo || !path) {
+                showStatus('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            try {
+                loadingIndicator.style.display = 'block';
+                
+                // جلب معلومات الملف من GitHub API
+                const fileInfo = await getFileFromGitHub(token, owner, repo, path);
+                
+                if (fileInfo) {
+                    // حفظ SHA للملف (مطلوب للتحديث)
+                    fileSha = fileInfo.sha;
+                    
+                    // فك تشفير محتوى Base64
+                    const content = atob(fileInfo.content.replace(/\s/g, ''));
+                    
+                    // حفظ المحتوى الأصلي
+                    originalContent = content;
+                    
+                    // عرض المحتوى في المحرر
+                    editor.innerHTML = content;
+                    
+                    // تحديث معلومات الملف
+                    fileInfoText.textContent = `الملف: ${path} | الحجم: ${formatFileSize(content.length)}`;
+                    
+                    // إظهار قسم المحرر
+                    editorSection.style.display = 'block';
+                    
+                    showStatus('تم تحميل الملف بنجاح', 'success');
+                }
+            } catch (error) {
+                console.error('Error loading file:', error);
+                showStatus(`خطأ في تحميل الملف: ${error.message}`, 'error');
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+        
+        // حدث حفظ التغييرات
+        saveBtn.addEventListener('click', async () => {
+            const token = githubTokenInput.value.trim();
+            const owner = repoOwnerInput.value.trim();
+            const repo = repoNameInput.value.trim();
+            const path = filePathInput.value.trim();
+            const newContent = editor.innerHTML;
+            
+            if (!token || !owner || !repo || !path) {
+                showStatus('يرجى ملء جميع الحقول', 'error');
+                return;
+            }
+            
+            if (newContent === originalContent) {
+                showStatus('لم تقم بإجراء أي تغييرات', 'warning');
+                return;
+            }
+            
+            try {
+                loadingIndicator.style.display = 'block';
+                saveBtn.disabled = true;
+                
+                // تشفير المحتوى إلى Base64
+                const encodedContent = btoa(newContent);
+                
+                // تحديث الملف على GitHub
+                const result = await updateFileOnGitHub(token, owner, repo, path, encodedContent, fileSha);
+                
+                if (result) {
+                    // تحديث SHA الجديد
+                    fileSha = result.content.sha;
+                    
+                    // تحديث المحتوى الأصلي
+                    originalContent = newContent;
+                    
+                    showStatus('تم حفظ التغييرات بنجاح', 'success');
+                }
+            } catch (error) {
+                console.error('Error saving file:', error);
+                showStatus(`خطأ في حفظ الملف: ${error.message}`, 'error');
+            } finally {
+                loadingIndicator.style.display = 'none';
+                saveBtn.disabled = false;
+            }
+        });
+        
+        // حدث تحميل الملف
+        downloadBtn.addEventListener('click', () => {
+            const content = editor.innerHTML;
+            const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filePathInput.value.split('/').pop() || 'file.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // حدث إعادة تعيين المحتوى
+        resetBtn.addEventListener('click', () => {
+            if (confirm('هل تريد حقًا إعادة تعيين جميع التغييرات؟')) {
+                editor.innerHTML = originalContent;
+                showStatus('تم إعادة تعيين المحتوى', 'success');
+            }
+        });
+        
+        // دالة لجلب الملف من GitHub
+        async function getFileFromGitHub(token, owner, repo, path) {
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`فشل في جلب الملف: ${response.status} ${response.statusText}`);
+            }
+            
+            return await response.json();
+        }
+        
+        // دالة لتحديث الملف على GitHub
+        async function updateFileOnGitHub(token, owner, repo, path, content, sha) {
+            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+            
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `تحديث ${path}`,
+                    content: content,
+                    sha: sha
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`فشل في تحديث الملف: ${response.status} ${response.statusText}`);
+            }
+            
+            return await response.json();
+        }
+        
+        // دالة لعرض رسائل الحالة
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+            
+            // إخفاء الرسالة بعد 5 ثواني
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // دالة لتنسيق حجم الملف
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
