@@ -41,6 +41,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             border: 2px dashed #ddd;
+            text-align: center;
         }
         
         .search-section {
@@ -88,12 +89,17 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            font-size: 14px;
         }
         
         th, td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: right;
             border: 1px solid #ddd;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         th {
@@ -179,6 +185,12 @@
         .btn-download:hover {
             background: #8e44ad;
         }
+        
+        .file-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -188,6 +200,7 @@
         <div class="upload-section">
             <input type="file" id="fileInput" accept=".xlsx, .xls">
             <button onclick="loadFile()">تحميل ملف Excel</button>
+            <div class="file-info" id="fileInfo"></div>
         </div>
         
         <div id="appContent" class="hidden">
@@ -203,7 +216,7 @@
             
             <div class="results-section">
                 <div class="results-count" id="resultsCount">لم يتم البحث بعد</div>
-                <div style="overflow-x: auto;">
+                <div style="overflow-x: auto; max-height: 500px;">
                     <table id="resultsTable">
                         <thead>
                             <tr id="tableHeader"></tr>
@@ -233,6 +246,7 @@
         let filteredData = [];
         let currentHeaders = [];
         let selectedRowIndex = -1;
+        let originalFileName = '';
 
         // تحميل ملف Excel
         function loadFile() {
@@ -244,19 +258,34 @@
                 return;
             }
             
+            originalFileName = file.name.replace(/\.[^/.]+$/, ""); // إزالة الامتداد
+            document.getElementById('fileInfo').textContent = `الملف: ${file.name} (${formatFileSize(file.size)})`;
+            
             const reader = new FileReader();
             
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    workbook = XLSX.read(data, { type: 'array' });
+                    workbook = XLSX.read(data, { 
+                        type: 'array',
+                        cellStyles: false, // تعطيل الأنماط لتقليل الحجم
+                        cellDates: true,
+                        dense: true // استخدام التنسيق الكثيف
+                    });
                     
                     // استخدام أول ورقة عمل
                     const firstSheetName = workbook.SheetNames[0];
                     currentSheet = workbook.Sheets[firstSheetName];
                     
+                    // الحفاظ على الخيارات الأصلية للورقة
+                    const sheetOptions = {
+                        header: 1,
+                        raw: true, // استخدام القيم الخام بدون تنسيق
+                        defval: "" // القيمة الافتراضية للخلايا الفارغة
+                    };
+                    
                     // تحويل البيانات إلى JSON
-                    originalData = XLSX.utils.sheet_to_json(currentSheet, { header: 1 });
+                    originalData = XLSX.utils.sheet_to_json(currentSheet, sheetOptions);
                     
                     if (originalData.length === 0) {
                         showMessage('الملف فارغ أو لا يحتوي على بيانات', 'error');
@@ -264,8 +293,11 @@
                     }
                     
                     // استخراج العناوين
-                    currentHeaders = originalData[0];
+                    currentHeaders = originalData[0] || [];
                     originalData = originalData.slice(1); // إزالة صف العناوين
+                    
+                    // تنظيف البيانات من القيم الفارغة غير الضرورية
+                    cleanData();
                     
                     // تهيئة واجهة التطبيق
                     initializeApp();
@@ -282,6 +314,17 @@
             };
             
             reader.readAsArrayBuffer(file);
+        }
+
+        // تنظيف البيانات لتقليل الحجم
+        function cleanData() {
+            originalData = originalData.map(row => {
+                return row.map(cell => {
+                    if (cell === null || cell === undefined) return "";
+                    if (typeof cell === 'string' && cell.trim() === "") return "";
+                    return cell;
+                });
+            });
         }
 
         // تهيئة التطبيق بعد تحميل الملف
@@ -369,6 +412,7 @@
             // إضافة عمود للإجراءات
             const actionsTh = document.createElement('th');
             actionsTh.textContent = 'الإجراءات';
+            actionsTh.style.width = '100px';
             tableHeader.appendChild(actionsTh);
             
             // إنشاء جسم الجدول
@@ -382,6 +426,7 @@
                 currentHeaders.forEach((header, colIndex) => {
                     const td = document.createElement('td');
                     td.textContent = row[colIndex] !== undefined ? row[colIndex] : '';
+                    td.title = row[colIndex] !== undefined ? row[colIndex].toString() : '';
                     tr.appendChild(td);
                 });
                 
@@ -510,7 +555,7 @@
             return true;
         }
 
-        // تحميل الملف المعدل
+        // تحميل الملف المعدل مع تحسين الحجم
         function downloadFile() {
             if (!workbook) {
                 showMessage('لا توجد بيانات لتحميلها', 'error');
@@ -518,26 +563,58 @@
             }
             
             try {
-                // تحديث البيانات في workbook
-                const updatedData = [currentHeaders, ...originalData];
-                const updatedSheet = XLSX.utils.aoa_to_sheet(updatedData);
-                workbook.Sheets[workbook.SheetNames[0]] = updatedSheet;
+                // إنشاء workbook جديد نظيف
+                const newWorkbook = XLSX.utils.book_new();
+                
+                // تحضير البيانات مع العناوين
+                const dataToExport = [currentHeaders, ...originalData];
+                
+                // إنشاء ورقة جديدة مع إعدادات محسنة للحجم
+                const newSheet = XLSX.utils.aoa_to_sheet(dataToExport, {
+                    cellStyles: false,
+                    compression: true
+                });
+                
+                // إضافة الورقة إلى workbook
+                XLSX.utils.book_append_sheet(newWorkbook, newSheet, 'Sheet1');
+                
+                // إعدادات الكتابة لتقليل الحجم
+                const wopts = {
+                    bookType: 'xlsx',
+                    type: 'array',
+                    compression: true // تفعيل الضغط
+                };
                 
                 // إنشاء الملف وتنزيله
-                const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const excelBuffer = XLSX.write(newWorkbook, wopts);
+                const blob = new Blob([excelBuffer], { 
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+                });
+                
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'ملف_معدل.xlsx';
+                a.download = `${originalFileName}_معدل.xlsx`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 
-                showMessage('تم تحميل الملف بنجاح', 'success');
+                showMessage(`تم تحميل الملف بنجاح - الحجم: ${formatFileSize(blob.size)}`, 'success');
+                
             } catch (error) {
                 console.error('Error downloading file:', error);
                 showMessage('حدث خطأ أثناء تحميل الملف', 'error');
             }
+        }
+
+        // تنسيق حجم الملف لعرضه بشكل مقروء
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
         // عرض الرسائل
