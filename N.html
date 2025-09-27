@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرر وعارض ملف Excel</title>
-    <!-- إضافة مكتبة SheetJS لقراءة ملفات Excel -->
+    <title>تصويب WAY - محرر Excel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -14,568 +12,691 @@
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
             --light-color: #ecf0f1;
-            --dark-color: #34495e;
         }
         
-        * {
-            box-sizing: border-box;
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5; 
             margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        body {
-            background-color: #f5f7fa;
-            color: var(--dark-color);
-            line-height: 1.6;
-            padding: 20px;
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
         }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-        
-        header {
+        .app-header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 1px solid #eee;
             padding-bottom: 20px;
+            border-bottom: 2px solid var(--light-color);
         }
         
-        h1 {
+        .app-title {
             color: var(--primary-color);
-            margin-bottom: 10px;
+            font-size: 2.5em;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
-        .description {
+        .app-subtitle {
             color: #7f8c8d;
-            font-size: 1.1rem;
+            font-size: 1.1em;
+            margin-top: 5px;
         }
         
-        .auth-section {
-            background-color: var(--light-color);
+        .control-panel {
+            background: var(--light-color);
             padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
         
-        .form-group {
+        @media (max-width: 768px) {
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .control-group {
             margin-bottom: 15px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 600;
+            color: var(--primary-color);
         }
         
-        input, textarea, button, select {
+        input, button, select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
         
         button {
-            background-color: var(--secondary-color);
+            background: var(--secondary-color);
             color: white;
             border: none;
             cursor: pointer;
             font-weight: 600;
-            transition: background-color 0.3s;
-            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         button:hover {
-            background-color: #2980b9;
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         button:disabled {
-            background-color: #bdc3c7;
+            background: #bdc3c7;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
-        .editor-section {
-            display: none;
-            margin-top: 30px;
-        }
-        
-        .file-info {
-            background-color: var(--light-color);
+        .auto-save-section {
+            background: #e8f4f8;
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin: 15px 0;
+            border-left: 4px solid var(--secondary-color);
         }
         
-        .excel-viewer {
-            margin-top: 20px;
-            overflow: auto;
-            max-height: 600px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .search-section {
+            background: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--warning-color);
         }
         
-        .sheet-tabs {
-            display: flex;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-            overflow-x: auto;
+        .status {
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: 500;
         }
         
-        .sheet-tab {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-right: 1px solid #ddd;
-            white-space: nowrap;
-        }
+        .success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+        .loading { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
         
-        .sheet-tab.active {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        .excel-table {
-            width: 100%;
+        table {
             border-collapse: collapse;
-            min-width: 800px;
+            width: 100%;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
-        .excel-table th {
-            background-color: var(--primary-color);
-            color: white;
+        th, td {
+            border: 1px solid #ddd;
             padding: 12px;
             text-align: center;
-            border: 1px solid #ddd;
+            min-width: 80px;
+        }
+        
+        th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
             position: sticky;
             top: 0;
         }
         
-        .excel-table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-            min-width: 100px;
+        td[contenteditable="true"] {
+            background: #fafafa;
+            transition: background 0.3s;
         }
         
-        .excel-table tr:nth-child(even) {
-            background-color: #f8f9fa;
+        td[contenteditable="true"]:focus {
+            background: #ffffcc;
+            outline: 3px solid var(--secondary-color);
+            outline-offset: -2px;
         }
         
-        .excel-table tr:hover {
-            background-color: #e3f2fd;
+        .search-highlight {
+            background: #ffeb3b !important;
+            font-weight: bold;
+            border: 2px solid #ff9800 !important;
         }
         
-        .editor-toolbar {
-            background-color: #f8f9fa;
-            padding: 10px;
+        .file-list {
+            max-height: 200px;
+            overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 5px;
-            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .file-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .file-item:hover {
+            background: #f0f0f0;
+            border-left-color: var(--secondary-color);
+        }
+        
+        .file-item.selected {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .excel-container {
+            overflow: auto;
+            max-height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .toolbar {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
         
-        .status-message {
+        .search-results {
+            background: #e3f2fd;
             padding: 10px;
             border-radius: 5px;
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
-        
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--secondary-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .view-options {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .editor-toolbar {
-                flex-direction: column;
-            }
-            
-            .view-options {
-                flex-direction: column;
-            }
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>عارض ومحرر ملف Excel على GitHub</h1>
-            <p class="description">هذه الأداة تسمح لك بعرض وتعديل ملف Excel الموجود في مستودع GitHub الخاص بك</p>
-        </header>
-        
-        <section class="auth-section">
-            <h2>معلومات المصادقة</h2>
-            <p>لعرض وتعديل الملف، تحتاج إلى توفير رمز الوصول الشخصي (Personal Access Token) من GitHub</p>
-            
-            <div class="form-group">
-                <label for="github-token">رمز الوصول الشخصي (GitHub Personal Access Token)</label>
-                <input type="password" id="github-token" placeholder="أدخل رمز الوصول الشخصي">
-                <small>يجب أن يحتوي الرمز على أذونات repo للوصول الكامل إلى المستودعات</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="repo-owner">مالك المستودع (Repository Owner)</label>
-                <input type="text" id="repo-owner" value="webdr-creator" placeholder="اسم المستخدم أو المنظمة">
-            </div>
-            
-            <div class="form-group">
-                <label for="repo-name">اسم المستودع (Repository Name)</label>
-                <input type="text" id="repo-name" value="webdr-creator.github.io" placeholder="اسم المستودع">
-            </div>
-            
-            <div class="form-group">
-                <label for="file-path">مسار الملف داخل المستودع</label>
-                <input type="text" id="file-path" value="Excel/MCQD.XLSX" placeholder="مسار الملف">
-            </div>
-            
-            <button id="load-file-btn">تحميل وعرض الملف</button>
-        </section>
-        
-        <div class="loading" id="loading-indicator">
-            <div class="spinner"></div>
-            <p>جاري تحميل وعرض البيانات...</p>
+        <div class="app-header">
+            <h1 class="app-title">تصويب WAY</h1>
+            <p class="app-subtitle">محرر Excel المتقدم مع البحث والحفظ التلقائي</p>
         </div>
         
-        <section class="editor-section" id="editor-section">
-            <div class="file-info">
-                <h3>معلومات الملف</h3>
-                <p id="file-info-text"></p>
-            </div>
-            
-            <div class="view-options">
-                <label for="sheet-select">اختر الورقة:</label>
-                <select id="sheet-select"></select>
+        <div class="control-panel">
+            <div class="left-panel">
+                <div class="control-group">
+                    <label for="token">رمز الوصول إلى GitHub</label>
+                    <input type="password" id="token" placeholder="أدخل الـ Token الخاص بك">
+                </div>
                 
-                <button id="download-btn">تحميل الملف الأصلي</button>
-                <button id="export-json-btn">تصدير كـ JSON</button>
-                <button id="export-csv-btn">تصدير كـ CSV</button>
+                <div class="control-group">
+                    <label for="repo-owner">مالك المستودع</label>
+                    <input type="text" id="repo-owner" value="webdr-creator" readonly>
+                </div>
+                
+                <div class="control-group">
+                    <label for="repo-name">اسم المستودع</label>
+                    <input type="text" id="repo-name" value="Excel" readonly>
+                </div>
+                
+                <button onclick="loadRepository()" id="load-repo-btn">
+                    <span>🔄</span> تحميل قائمة الملفات
+                </button>
             </div>
             
-            <div class="editor-toolbar">
-                <button id="save-btn">حفظ التغييرات على GitHub</button>
-                <button id="add-row-btn">إضافة صف</button>
-                <button id="add-col-btn">إضافة عمود</button>
-                <button id="reset-btn">إعادة تعيين</button>
+            <div class="right-panel">
+                <div class="control-group">
+                    <label>اختر ملف Excel</label>
+                    <div class="file-list" id="file-list">
+                        <div class="file-item" style="text-align: center; color: #7f8c8d;">
+                            ⬅️ قم بتحميل قائمة الملفات أولاً
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="sheet-select">اختر الورقة</label>
+                    <select id="sheet-select" onchange="changeSheet()" disabled>
+                        <option value="">-- اختر ورقة --</option>
+                    </select>
+                </div>
             </div>
-            
-            <div class="excel-viewer" id="excel-viewer">
-                <!-- سيتم عرض جدول Excel هنا -->
+        </div>
+        
+        <div class="auto-save-section">
+            <label>
+                <input type="checkbox" id="auto-save"> حفظ تلقائي 7s (يتم الحفظ بعد 7 ثواني من التعديل)
+            </label>
+            <span id="auto-save-status"></span>
+        </div>
+        
+        <div class="search-section">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="search-input" placeholder="ابحث عن كلمة أو عبارة..." style="flex: 1;">
+                <button onclick="searchInSheet()" id="search-btn">🔍 بحث</button>
+                <button onclick="clearSearch()" id="clear-search-btn">🗑️ مسح البحث</button>
             </div>
-            
-            <div class="status-message" id="status-message"></div>
-        </section>
+            <div id="search-results" class="search-results" style="display: none;">
+                <span id="search-count">0</span> نتيجة found - 
+                <button onclick="prevResult()">◀ السابق</button>
+                <span id="current-result">0</span>
+                <button onclick="nextResult()">التالي ▶</button>
+            </div>
+        </div>
+        
+        <div class="toolbar">
+            <button onclick="loadSelectedFile()" id="load-file-btn" disabled>📂 تحميل الملف المحدد</button>
+            <button onclick="saveFile()" id="save-btn" disabled>💾 حفظ على GitHub</button>
+            <button onclick="addRow()">➕ إضافة صف</button>
+            <button onclick="addColumn()">➕ إضافة عمود</button>
+            <button onclick="exportToCSV()">📊 تصدير كـ CSV</button>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div class="excel-container" id="excel-container">
+            <table id="excel-table"></table>
+        </div>
     </div>
 
     <script>
-        // عناصر DOM
-        const githubTokenInput = document.getElementById('github-token');
-        const repoOwnerInput = document.getElementById('repo-owner');
-        const repoNameInput = document.getElementById('repo-name');
-        const filePathInput = document.getElementById('file-path');
-        const loadFileBtn = document.getElementById('load-file-btn');
-        const editorSection = document.getElementById('editor-section');
-        const saveBtn = document.getElementById('save-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const exportJsonBtn = document.getElementById('export-json-btn');
-        const exportCsvBtn = document.getElementById('export-csv-btn');
-        const addRowBtn = document.getElementById('add-row-btn');
-        const addColBtn = document.getElementById('add-col-btn');
-        const resetBtn = document.getElementById('reset-btn');
-        const sheetSelect = document.getElementById('sheet-select');
-        const statusMessage = document.getElementById('status-message');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const fileInfoText = document.getElementById('file-info-text');
-        const excelViewer = document.getElementById('excel-viewer');
-        
-        // متغيرات التطبيق
-        let originalWorkbook = null;
+        // المتغيرات العامة
         let currentWorkbook = null;
+        let originalWorkbook = null;
         let fileSha = '';
-        let currentSheetName = '';
-        
-        // حدث تحميل الملف
-        loadFileBtn.addEventListener('click', async () => {
-            const token = githubTokenInput.value.trim();
-            const owner = repoOwnerInput.value.trim();
-            const repo = repoNameInput.value.trim();
-            const path = filePathInput.value.trim();
+        let autoSaveTimer = null;
+        let isModified = false;
+        let currentFileName = '';
+        let searchResults = [];
+        let currentSearchIndex = -1;
+
+        // دالة لنسخ الـ Workbook
+        function copyWorkbook(workbook) {
+            const newWorkbook = XLSX.utils.book_new();
+            workbook.SheetNames.forEach(sheetName => {
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                const newWorksheet = XLSX.utils.aoa_to_sheet(jsonData);
+                XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, sheetName);
+            });
+            return newWorkbook;
+        }
+
+        // تحميل قائمة الملفات من المستودع
+        async function loadRepository() {
+            const token = document.getElementById('token').value;
+            const owner = document.getElementById('repo-owner').value;
+            const repo = document.getElementById('repo-name').value;
             
-            if (!token || !owner || !repo || !path) {
-                showStatus('يرجى ملء جميع الحقول', 'error');
+            if (!token) {
+                showStatus('❌ أدخل الـ Token أولاً', 'error');
                 return;
             }
-            
+
             try {
-                loadingIndicator.style.display = 'block';
-                loadFileBtn.disabled = true;
+                showStatus('⏳ جاري تحميل قائمة الملفات...', 'loading');
+                document.getElementById('load-repo-btn').disabled = true;
                 
-                // جلب الملف من GitHub
-                const fileData = await getFileFromGitHub(token, owner, repo, path);
+                const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
                 
-                if (fileData) {
-                    fileSha = fileData.sha;
-                    
-                    // تحويل محتوى Base64 إلى ArrayBuffer
-                    const content = base64ToArrayBuffer(fileData.content);
-                    
-                    // قراءة ملف Excel باستخدام SheetJS
-                    const workbook = XLSX.read(content, { type: 'array' });
-                    
-                    // حفظ النسخة الأصلية والحالية
-                    originalWorkbook = workbook;
-                    currentWorkbook = XLSX.utils.book_copy(workbook);
-                    
-                    // عرض معلومات الملف
-                    fileInfoText.textContent = `الملف: ${path} | الحجم: ${formatFileSize(content.byteLength)} | عدد الأوراق: ${workbook.SheetNames.length}`;
-                    
-                    // تعبئة قائمة الأوراق
-                    populateSheetSelect(workbook.SheetNames);
-                    
-                    // عرض الورقة الأولى
-                    displaySheet(workbook.SheetNames[0]);
-                    
-                    // إظهار قسم المحرر
-                    editorSection.style.display = 'block';
-                    
-                    showStatus('تم تحميل وعرض الملف بنجاح', 'success');
+                if (!response.ok) {
+                    throw new Error(`خطأ في التحميل: ${response.status}`);
                 }
+                
+                const files = await response.json();
+                const excelFiles = files.filter(file => 
+                    file.name.toLowerCase().endsWith('.xlsx') || 
+                    file.name.toLowerCase().endsWith('.xls') ||
+                    file.name.toLowerCase().endsWith('.csv')
+                );
+                
+                const fileList = document.getElementById('file-list');
+                if (excelFiles.length === 0) {
+                    fileList.innerHTML = '<div style="text-align: center; color: #7f8c8d;">📭 لم يتم العثور على ملفات Excel</div>';
+                } else {
+                    fileList.innerHTML = excelFiles.map(file => `
+                        <div class="file-item" onclick="selectFile('${file.name}', '${file.path}')">
+                            📊 ${file.name}
+                        </div>
+                    `).join('');
+                }
+                
+                showStatus(`✅ تم تحميل ${excelFiles.length} ملف Excel`, 'success');
+                
             } catch (error) {
-                console.error('Error loading file:', error);
-                showStatus(`خطأ في تحميل الملف: ${error.message}`, 'error');
+                showStatus(`❌ خطأ: ${error.message}`, 'error');
             } finally {
-                loadingIndicator.style.display = 'none';
-                loadFileBtn.disabled = false;
+                document.getElementById('load-repo-btn').disabled = false;
             }
-        });
-        
-        // حدث تغيير الورقة
-        sheetSelect.addEventListener('change', () => {
-            const selectedSheet = sheetSelect.value;
+        }
+
+        // اختيار ملف من القائمة
+        function selectFile(fileName, filePath) {
+            // إزالة التحديد من جميع العناصر
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // إضافة التحديد للعنصر المختار
+            event.target.classList.add('selected');
+            
+            // تمكين زر تحميل الملف
+            document.getElementById('load-file-btn').disabled = false;
+            currentFileName = fileName;
+            
+            showStatus(`📁 الملف المحدد: ${fileName}`, 'success');
+        }
+
+        // تحميل الملف المحدد
+        async function loadSelectedFile() {
+            const token = document.getElementById('token').value;
+            const owner = document.getElementById('repo-owner').value;
+            const repo = document.getElementById('repo-name').value;
+            
+            if (!currentFileName) {
+                showStatus('❌ لم يتم اختيار أي ملف', 'error');
+                return;
+            }
+
+            try {
+                showStatus(`⏳ جاري تحميل ${currentFileName}...`, 'loading');
+                
+                const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${currentFileName}`, {
+                    headers: { 'Authorization': `token ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`خطأ في التحميل: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                fileSha = data.sha;
+                
+                // تحويل المحتوى
+                const content = atob(data.content.replace(/\s/g, ''));
+                const arrayBuffer = new Uint8Array(content.length);
+                for (let i = 0; i < content.length; i++) {
+                    arrayBuffer[i] = content.charCodeAt(i);
+                }
+                
+                // قراءة Excel
+                currentWorkbook = XLSX.read(arrayBuffer, { type: 'array' });
+                originalWorkbook = copyWorkbook(currentWorkbook);
+                
+                // تعبئة قائمة الأوراق
+                populateSheetSelect();
+                
+                // عرض الجدول
+                displaySheet(currentWorkbook.SheetNames[0]);
+                
+                document.getElementById('excel-container').style.display = 'block';
+                document.getElementById('save-btn').disabled = false;
+                document.getElementById('sheet-select').disabled = false;
+                
+                showStatus(`✅ تم تحميل ${currentFileName} بنجاح!`, 'success');
+                
+            } catch (error) {
+                showStatus(`❌ خطأ: ${error.message}`, 'error');
+            }
+        }
+
+        // تعبئة قائمة الأوراق
+        function populateSheetSelect() {
+            const select = document.getElementById('sheet-select');
+            select.innerHTML = '';
+            if (currentWorkbook && currentWorkbook.SheetNames) {
+                currentWorkbook.SheetNames.forEach(sheetName => {
+                    const option = document.createElement('option');
+                    option.value = sheetName;
+                    option.textContent = sheetName;
+                    select.appendChild(option);
+                });
+            }
+        }
+
+        // تغيير الورقة المعروضة
+        function changeSheet() {
+            const selectedSheet = document.getElementById('sheet-select').value;
             if (selectedSheet) {
                 displaySheet(selectedSheet);
+                clearSearch(); // مسح نتائج البحث عند تغيير الورقة
             }
-        });
-        
-        // حدث حفظ التغييرات
-        saveBtn.addEventListener('click', async () => {
-            const token = githubTokenInput.value.trim();
-            const owner = repoOwnerInput.value.trim();
-            const repo = repoNameInput.value.trim();
-            const path = filePathInput.value.trim();
-            
-            if (!token || !owner || !repo || !path) {
-                showStatus('يرجى ملء جميع الحقول', 'error');
+        }
+
+        // عرض الورقة
+        function displaySheet(sheetName) {
+            if (!currentWorkbook || !currentWorkbook.Sheets[sheetName]) {
+                showStatus('❌ الورقة غير موجودة', 'error');
                 return;
             }
             
+            const worksheet = currentWorkbook.Sheets[sheetName];
+            const html = XLSX.utils.sheet_to_html(worksheet);
+            document.getElementById('excel-table').innerHTML = html;
+            
+            makeCellsEditable();
+        }
+
+        // جعل الخلايا قابلة للتعديل
+        function makeCellsEditable() {
+            const cells = document.querySelectorAll('#excel-table td');
+            cells.forEach(cell => {
+                cell.setAttribute('contenteditable', 'true');
+                
+                cell.addEventListener('input', function() {
+                    isModified = true;
+                    document.getElementById('save-btn').style.background = '#ff9800';
+                    document.getElementById('save-btn').innerHTML = '💾 حفظ التغييرات 🟡';
+                    
+                    // الحفظ التلقائي بعد 7 ثواني
+                    if (document.getElementById('auto-save').checked) {
+                        clearTimeout(autoSaveTimer);
+                        autoSaveTimer = setTimeout(autoSave, 7000);
+                        document.getElementById('auto-save-status').textContent = '⏳ سيتم الحفظ تلقائياً بعد 7 ثواني...';
+                    }
+                });
+            });
+        }
+
+        // البحث في الورقة
+        function searchInSheet() {
+            const searchTerm = document.getElementById('search-input').value.trim();
+            if (!searchTerm) {
+                showStatus('❌ أدخل كلمة للبحث', 'warning');
+                return;
+            }
+            
+            const cells = document.querySelectorAll('#excel-table td');
+            searchResults = [];
+            currentSearchIndex = -1;
+            
+            cells.forEach((cell, index) => {
+                if (cell.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    searchResults.push(index);
+                }
+            });
+            
+            if (searchResults.length === 0) {
+                showStatus('❌ لم يتم العثور على نتائج', 'warning');
+                document.getElementById('search-results').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('search-count').textContent = searchResults.length;
+            document.getElementById('search-results').style.display = 'block';
+            showStatus(`✅ تم العثور على ${searchResults.length} نتيجة`, 'success');
+            
+            // عرض أول نتيجة
+            nextResult();
+        }
+
+        // الانتقال إلى نتيجة البحث التالية
+        function nextResult() {
+            if (searchResults.length === 0) return;
+            
+            currentSearchIndex = (currentSearchIndex + 1) % searchResults.length;
+            highlightSearchResult();
+        }
+
+        // الانتقال إلى نتيجة البحث السابقة
+        function prevResult() {
+            if (searchResults.length === 0) return;
+            
+            currentSearchIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+            highlightSearchResult();
+        }
+
+        // تمييز نتيجة البحث الحالية
+        function highlightSearchResult() {
+            // إزالة التمييز من جميع الخلايا
+            document.querySelectorAll('#excel-table td').forEach(cell => {
+                cell.classList.remove('search-highlight');
+            });
+            
+            if (currentSearchIndex >= 0 && currentSearchIndex < searchResults.length) {
+                const cells = document.querySelectorAll('#excel-table td');
+                const cellIndex = searchResults[currentSearchIndex];
+                
+                if (cells[cellIndex]) {
+                    cells[cellIndex].classList.add('search-highlight');
+                    cells[cellIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    document.getElementById('current-result').textContent = currentSearchIndex + 1;
+                }
+            }
+        }
+
+        // مسح نتائج البحث
+        function clearSearch() {
+            document.querySelectorAll('#excel-table td').forEach(cell => {
+                cell.classList.remove('search-highlight');
+            });
+            
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').style.display = 'none';
+            searchResults = [];
+            currentSearchIndex = -1;
+        }
+
+        // الحفظ التلقائي
+        function autoSave() {
+            if (isModified && document.getElementById('auto-save').checked) {
+                document.getElementById('auto-save-status').textContent = '💾 جاري الحفظ التلقائي...';
+                saveFile();
+            }
+        }
+
+        // حفظ الملف على GitHub
+        async function saveFile() {
+            if (!isModified) {
+                showStatus('⚠️ لم تقم بأي تغييرات', 'warning');
+                return;
+            }
+
+            const token = document.getElementById('token').value;
+            const owner = document.getElementById('repo-owner').value;
+            const repo = document.getElementById('repo-name').value;
+            
+            if (!token) {
+                showStatus('❌ أدخل الـ Token', 'error');
+                return;
+            }
+
             try {
-                loadingIndicator.style.display = 'block';
-                saveBtn.disabled = true;
+                showStatus('⏳ جاري الحفظ على GitHub...', 'loading');
+                document.getElementById('save-btn').disabled = true;
+                
+                // تحديث البيانات من الجدول
+                updateWorkbookFromTable();
                 
                 // تحويل Workbook إلى ArrayBuffer
                 const arrayBuffer = XLSX.write(currentWorkbook, { bookType: 'xlsx', type: 'array' });
                 
-                // تحويل ArrayBuffer إلى Base64
-                const base64Content = arrayBufferToBase64(arrayBuffer);
-                
-                // تحديث الملف على GitHub
-                const result = await updateFileOnGitHub(token, owner, repo, path, base64Content, fileSha);
-                
-                if (result) {
-                    fileSha = result.content.sha;
-                    originalWorkbook = XLSX.utils.book_copy(currentWorkbook);
-                    showStatus('تم حفظ التغييرات بنجاح على GitHub', 'success');
+                // تحويل إلى Base64
+                let binary = '';
+                const bytes = new Uint8Array(arrayBuffer);
+                for (let i = 0; i < bytes.byteLength; i++) {
+                    binary += String.fromCharCode(bytes[i]);
                 }
-            } catch (error) {
-                console.error('Error saving file:', error);
-                showStatus(`خطأ في حفظ الملف: ${error.message}`, 'error');
-            } finally {
-                loadingIndicator.style.display = 'none';
-                saveBtn.disabled = false;
-            }
-        });
-        
-        // حدث تحميل الملف الأصلي
-        downloadBtn.addEventListener('click', () => {
-            if (!currentWorkbook) return;
-            
-            XLSX.writeFile(currentWorkbook, filePathInput.value.split('/').pop() || 'file.xlsx');
-            showStatus('تم بدء تحميل الملف', 'success');
-        });
-        
-        // حدث تصدير كـ JSON
-        exportJsonBtn.addEventListener('click', () => {
-            if (!currentWorkbook || !currentSheetName) return;
-            
-            const worksheet = currentWorkbook.Sheets[currentSheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-            
-            const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
-            downloadBlob(blob, `${currentSheetName}.json`);
-            showStatus('تم تصدير البيانات كـ JSON', 'success');
-        });
-        
-        // حدث تصدير كـ CSV
-        exportCsvBtn.addEventListener('click', () => {
-            if (!currentWorkbook || !currentSheetName) return;
-            
-            const worksheet = currentWorkbook.Sheets[currentSheetName];
-            const csvData = XLSX.utils.sheet_to_csv(worksheet);
-            
-            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-            downloadBlob(blob, `${currentSheetName}.csv`);
-            showStatus('تم تصدير البيانات كـ CSV', 'success');
-        });
-        
-        // حدث إضافة صف
-        addRowBtn.addEventListener('click', () => {
-            if (!currentWorkbook || !currentSheetName) return;
-            
-            const worksheet = currentWorkbook.Sheets[currentSheetName];
-            const range = XLSX.utils.decode_range(worksheet['!ref']);
-            range.e.r += 1; // زيادة عدد الصفوف
-            
-            // إضافة خلية فارغة في آخر صف
-            const newRow = range.e.r;
-            const cols = range.e.c;
-            
-            for (let c = 0; c <= cols; c++) {
-                const cellAddress = XLSX.utils.encode_cell({ r: newRow, c: c });
-                if (!worksheet[cellAddress]) {
-                    worksheet[cellAddress] = { v: '', t: 's' };
-                }
-            }
-            
-            worksheet['!ref'] = XLSX.utils.encode_range(range);
-            displaySheet(currentSheetName);
-            showStatus('تم إضافة صف جديد', 'success');
-        });
-        
-        // حدث إضافة عمود
-        addColBtn.addEventListener('click', () => {
-            if (!currentWorkbook || !currentSheetName) return;
-            
-            const worksheet = currentWorkbook.Sheets[currentSheetName];
-            const range = XLSX.utils.decode_range(worksheet['!ref']);
-            range.e.c += 1; // زيادة عدد الأعمدة
-            
-            // إضافة خلية فارغة في آخر عمود
-            const newCol = range.e.c;
-            const rows = range.e.r;
-            
-            for (let r = 0; r <= rows; r++) {
-                const cellAddress = XLSX.utils.encode_cell({ r: r, c: newCol });
-                if (!worksheet[cellAddress]) {
-                    worksheet[cellAddress] = { v: '', t: 's' };
-                }
-            }
-            
-            worksheet['!ref'] = XLSX.utils.encode_range(range);
-            displaySheet(currentSheetName);
-            showStatus('تم إضافة عمود جديد', 'success');
-        });
-        
-        // حدث إعادة تعيين
-        resetBtn.addEventListener('click', () => {
-            if (confirm('هل تريد حقًا إعادة تعيين جميع التغييرات؟')) {
-                currentWorkbook = XLSX.utils.book_copy(originalWorkbook);
-                displaySheet(currentSheetName);
-                showStatus('تم إعادة تعيين جميع التغييرات', 'success');
-            }
-        });
-        
-        // دالة لعرض ورقة Excel
-        function displaySheet(sheetName) {
-            if (!currentWorkbook) return;
-            
-            currentSheetName = sheetName;
-            const worksheet = currentWorkbook.Sheets[sheetName];
-            const htmlString = XLSX.utils.sheet_to_html(worksheet, { editable: true });
-            
-            excelViewer.innerHTML = htmlString;
-            
-            // جعل الخلايا قابلة للتعديل
-            makeCellsEditable();
-        }
-        
-        // دالة لجعل الخلايا قابلة للتعديل
-        function makeCellsEditable() {
-            const cells = excelViewer.querySelectorAll('td');
-            cells.forEach(cell => {
-                cell.setAttribute('contenteditable', 'true');
+                const base64Content = btoa(binary);
                 
-                cell.addEventListener('blur', function() {
-                    updateWorkbookFromTable(this);
+                // الحفظ على GitHub
+                const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${currentFileName}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `تصويب WAY - تحديث الملف: ${new Date().toLocaleString()}`,
+                        content: base64Content,
+                        sha: fileSha
+                    })
                 });
-            });
+                
+                if (!response.ok) {
+                    throw new Error(`خطأ في الحفظ: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                fileSha = result.content.sha;
+                isModified = false;
+                
+                document.getElementById('save-btn').style.background = '';
+                document.getElementById('save-btn').innerHTML = '💾 حفظ على GitHub';
+                document.getElementById('save-btn').disabled = false;
+                document.getElementById('auto-save-status').textContent = '';
+                
+                showStatus('✅ تم حفظ التغييرات على GitHub بنجاح!', 'success');
+                
+            } catch (error) {
+                showStatus(`❌ خطأ في الحفظ: ${error.message}`, 'error');
+                document.getElementById('save-btn').disabled = false;
+            }
         }
-        
-        // دالة لتحديث Workbook من الجدول
-        function updateWorkbookFromTable(cell) {
-            if (!currentWorkbook || !currentSheetName) return;
+
+        // تحديث البيانات من الجدول إلى Workbook
+        function updateWorkbookFromTable() {
+            if (!currentWorkbook) return;
             
-            const worksheet = currentWorkbook.Sheets[currentSheetName];
-            const table = excelViewer.querySelector('table');
-            const rows = table.rows;
+            const table = document.getElementById('excel-table');
+            const sheetName = document.getElementById('sheet-select').value;
+            const worksheet = currentWorkbook.Sheets[sheetName];
             
-            for (let r = 0; r < rows.length; r++) {
-                for (let c = 0; c < rows[r].cells.length; c++) {
+            if (!worksheet) return;
+            
+            for (let r = 0; r < table.rows.length; r++) {
+                for (let c = 0; c < table.rows[r].cells.length; c++) {
                     const cellAddress = XLSX.utils.encode_cell({ r: r, c: c });
-                    const cellValue = rows[r].cells[c].textContent;
+                    const cellValue = table.rows[r].cells[c].textContent;
                     
                     if (!worksheet[cellAddress]) {
                         worksheet[cellAddress] = { t: 's', v: cellValue };
@@ -585,106 +706,102 @@
                 }
             }
         }
-        
-        // دالة لتعبيئة قائمة الأوراق
-        function populateSheetSelect(sheetNames) {
-            sheetSelect.innerHTML = '';
-            sheetNames.forEach(name => {
-                const option = document.createElement('option');
-                option.value = name;
-                option.textContent = name;
-                sheetSelect.appendChild(option);
-            });
-        }
-        
-        // الدوال المساعدة
-        async function getFileFromGitHub(token, owner, repo, path) {
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+        // إضافة صف جديد
+        function addRow() {
+            if (!currentWorkbook) return;
             
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json'
+            const sheetName = document.getElementById('sheet-select').value;
+            const worksheet = currentWorkbook.Sheets[sheetName];
+            if (!worksheet || !worksheet['!ref']) return;
+            
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            range.e.r += 1;
+            
+            for (let c = 0; c <= range.e.c; c++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: range.e.r, c: c });
+                if (!worksheet[cellAddress]) {
+                    worksheet[cellAddress] = { v: '', t: 's' };
                 }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`فشل في جلب الملف: ${response.status} ${response.statusText}`);
             }
             
-            return await response.json();
+            worksheet['!ref'] = XLSX.utils.encode_range(range);
+            displaySheet(sheetName);
+            isModified = true;
+            showStatus('✅ تم إضافة صف جديد', 'success');
         }
-        
-        async function updateFileOnGitHub(token, owner, repo, path, content, sha) {
-            const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+
+        // إضافة عمود جديد
+        function addColumn() {
+            if (!currentWorkbook) return;
             
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `تحديث ${path}`,
-                    content: content,
-                    sha: sha
-                })
-            });
+            const sheetName = document.getElementById('sheet-select').value;
+            const worksheet = currentWorkbook.Sheets[sheetName];
+            if (!worksheet || !worksheet['!ref']) return;
             
-            if (!response.ok) {
-                throw new Error(`فشل في تحديث الملف: ${response.status} ${response.statusText}`);
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            range.e.c += 1;
+            
+            for (let r = 0; r <= range.e.r; r++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: r, c: range.e.c });
+                if (!worksheet[cellAddress]) {
+                    worksheet[cellAddress] = { v: '', t: 's' };
+                }
             }
             
-            return await response.json();
+            worksheet['!ref'] = XLSX.utils.encode_range(range);
+            displaySheet(sheetName);
+            isModified = true;
+            showStatus('✅ تم إضافة عمود جديد', 'success');
         }
-        
-        function base64ToArrayBuffer(base64) {
-            const binaryString = atob(base64.replace(/\s/g, ''));
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            return bytes.buffer;
-        }
-        
-        function arrayBufferToBase64(buffer) {
-            let binary = '';
-            const bytes = new Uint8Array(buffer);
-            for (let i = 0; i < bytes.byteLength; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return btoa(binary);
-        }
-        
-        function downloadBlob(blob, filename) {
+
+        // تصدير إلى CSV
+        function exportToCSV() {
+            if (!currentWorkbook) return;
+            
+            const sheetName = document.getElementById('sheet-select').value;
+            const worksheet = currentWorkbook.Sheets[sheetName];
+            const csv = XLSX.utils.sheet_to_csv(worksheet);
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-        
-        function showStatus(message, type) {
-            statusMessage.textContent = message;
-            statusMessage.className = `status-message ${type}`;
-            statusMessage.style.display = 'block';
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${currentFileName.replace('.xlsx', '')}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
-            setTimeout(() => {
-                statusMessage.style.display = 'none';
-            }, 5000);
+            showStatus('✅ تم تصدير الملف كـ CSV', 'success');
         }
+
+        // عرض رسائل الحالة
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // تحذير عند مغادرة الصفحة مع وجود تغييرات غير محفوظة
+        window.addEventListener('beforeunload', (event) => {
+            if (isModified) {
+                event.preventDefault();
+                event.returnValue = 'لديك تغييرات غير محفوظة. هل تريد المغادرة؟';
+            }
+        });
+
+        // تمكين إدخال البحث بالضغط على Enter
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchInSheet();
+            }
+        });
     </script>
 </body>
 </html>
