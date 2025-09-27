@@ -151,17 +151,24 @@
             box-shadow: none;
         }
         
-        .auto-save-section {
-            background: #e8f4f8;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid var(--secondary-color);
-            text-align: center;
+        .auto-save-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 15px;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .auto-save-container label {
+            margin: 0;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
         }
         
         .search-section {
@@ -261,14 +268,14 @@
             min-width: 800px;
             transform-origin: 0 0;
             transition: transform 0.3s ease;
-            font-size: 12px !important;
         }
         
         #excel-table th,
         #excel-table td {
-            font-size: 12px !important;
-            line-height: 1.2;
-            padding: 8px !important;
+            font-size: 13px !important;
+            line-height: 1.3;
+            padding: 10px !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         th, td {
@@ -278,8 +285,8 @@
             min-width: 80px;
             cursor: pointer;
             transition: background 0.3s;
-            font-size: 12px;
-            line-height: 1.2;
+            font-size: 13px;
+            line-height: 1.3;
         }
         
         th {
@@ -289,12 +296,12 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            font-size: 12px;
+            font-size: 13px;
         }
         
         td {
             background: #fafafa;
-            font-size: 12px;
+            font-size: 13px;
         }
         
         td:hover {
@@ -411,16 +418,6 @@
             font-size: 1.2em;
             margin: 0 15px;
         }
-        
-        .touch-hint {
-            text-align: center;
-            color: #666;
-            font-size: 0.9em;
-            margin-top: 10px;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
@@ -469,6 +466,12 @@
                         <option value="">-- اختر ورقة --</option>
                     </select>
                 </div>
+
+                <div class="auto-save-container">
+                    <label>
+                        <input type="checkbox" id="auto-save"> حفظ تلقائي
+                    </label>
+                </div>
             </div>
         </div>
         
@@ -478,12 +481,6 @@
             <button onclick="addRow()">➕ إضافة صف</button>
             <button onclick="addColumn()">➕ إضافة عمود</button>
             <button onclick="exportToXLSX()">📊 تصدير كـ XLSX</button>
-            
-            <div class="auto-save-section" style="margin: 0; margin-left: auto;">
-                <label>
-                    <input type="checkbox" id="auto-save"> حفظ تلقائي
-                </label>
-            </div>
         </div>
         
         <div id="status"></div>
@@ -519,10 +516,6 @@
                 <button onclick="saveCellEdit()" style="background: #4CAF50;">💾 حفظ التعديل</button>
                 <button onclick="cancelCellEdit()" style="background: #f44336;">❌ إلغاء</button>
             </div>
-        </div>
-        
-        <div class="touch-hint">
-            💡 يمكنك التكبير/التصغير باستخدام إصبعين على الجدول (مثل خرائط Google)
         </div>
         
         <div class="excel-wrapper" id="excel-wrapper">
@@ -761,19 +754,20 @@
             const html = XLSX.utils.sheet_to_html(worksheet);
             document.getElementById('excel-table').innerHTML = html;
             
-            // تطبيق حجم خط موحد
+            // تطبيق حجم خط موحد لجميع الخلايا بما في ذلك العمود الأول
             applyUniformFontSize();
             
             makeCellsClickable();
         }
 
-        // تطبيق حجم خط موحد
+        // تطبيق حجم خط موحد لجميع الخلايا
         function applyUniformFontSize() {
             const cells = document.querySelectorAll('#excel-table th, #excel-table td');
             cells.forEach(cell => {
-                cell.style.fontSize = '12px';
-                cell.style.lineHeight = '1.2';
-                cell.style.padding = '8px';
+                cell.style.fontSize = '13px';
+                cell.style.lineHeight = '1.3';
+                cell.style.padding = '10px';
+                cell.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
             });
         }
 
