@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>تصويب WAY - محرر Excel</title>
+    <title>WAY Correcter - محرر Excel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -19,6 +19,7 @@
             padding: 20px; 
             background: #f5f5f5; 
             margin: 0;
+            zoom: 100%;
         }
         
         .container { 
@@ -39,38 +40,51 @@
         
         .app-title {
             color: var(--primary-color);
-            font-size: 2.5em;
+            font-size: 2.8em;
             margin: 0;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-        
-        .app-subtitle {
-            color: #7f8c8d;
-            font-size: 1.1em;
-            margin-top: 5px;
+            font-weight: bold;
         }
         
         .control-panel {
             background: var(--light-color);
-            padding: 20px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 12px;
             margin-bottom: 25px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 30px;
+            border: 2px solid #ddd;
         }
         
-        @media (max-width: 768px) {
+        @media (max-width: 968px) {
             .control-panel {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
         }
         
+        .github-section, .files-section {
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+            font-weight: bold;
+        }
+        
         .control-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         label {
@@ -78,14 +92,16 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: var(--primary-color);
+            font-size: 1em;
         }
         
         input, button, select {
-            padding: 12px 15px;
+            padding: 14px 16px;
             border: 2px solid #ddd;
             border-radius: 8px;
             font-size: 1em;
             transition: all 0.3s ease;
+            width: 100%;
         }
         
         input:focus, select:focus {
@@ -103,8 +119,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             white-space: nowrap;
+            font-size: 1em;
+            padding: 14px 20px;
         }
         
         button:hover {
@@ -126,6 +144,7 @@
             border-radius: 8px;
             margin: 15px 0;
             border-left: 4px solid var(--secondary-color);
+            text-align: center;
         }
         
         .search-section {
@@ -138,7 +157,7 @@
         
         .search-container {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             align-items: center;
             margin-bottom: 15px;
         }
@@ -146,25 +165,53 @@
         .search-input {
             flex: 1;
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             font-size: 1.1em;
         }
         
         .search-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         
         .search-button {
-            padding: 15px 20px;
-            min-width: 120px;
+            padding: 16px 24px;
+            min-width: 130px;
+            font-size: 1.1em;
+        }
+        
+        .edit-section {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #4CAF50;
+            display: none;
+        }
+        
+        .edit-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+        }
+        
+        .edit-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
         }
         
         .status {
-            padding: 12px 15px;
-            margin: 10px 0;
+            padding: 15px;
+            margin: 15px 0;
             border-radius: 8px;
             font-weight: 500;
+            font-size: 1.1em;
         }
         
         .success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
@@ -172,18 +219,57 @@
         .warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
         .loading { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
         
-        table {
+        .zoom-controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .zoom-button {
+            padding: 10px 15px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        
+        .zoom-level {
+            font-weight: bold;
+            color: var(--primary-color);
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .excel-wrapper {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: auto;
+            max-height: 600px;
+            margin-top: 15px;
+            position: relative;
+        }
+        
+        #excel-table {
             border-collapse: collapse;
             width: 100%;
-            margin: 20px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 800px;
+            transform-origin: 0 0;
+            transition: transform 0.3s ease;
         }
         
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 14px;
             text-align: center;
-            min-width: 80px;
+            min-width: 100px;
+            cursor: pointer;
+            transition: background 0.3s;
         }
         
         th {
@@ -192,17 +278,20 @@
             font-weight: 600;
             position: sticky;
             top: 0;
+            z-index: 10;
         }
         
-        td[contenteditable="true"] {
+        td {
             background: #fafafa;
-            transition: background 0.3s;
         }
         
-        td[contenteditable="true"]:focus {
-            background: #ffffcc;
-            outline: 3px solid var(--secondary-color);
-            outline-offset: -2px;
+        td:hover {
+            background: #e3f2fd;
+        }
+        
+        .selected-cell {
+            background: #fff9c4 !important;
+            border: 2px solid #ff9800 !important;
         }
         
         .search-highlight {
@@ -219,7 +308,7 @@
         }
         
         .file-list {
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -228,41 +317,36 @@
         }
         
         .file-item {
-            padding: 8px 12px;
-            margin: 5px 0;
+            padding: 12px 15px;
+            margin: 8px 0;
             border-radius: 5px;
             cursor: pointer;
-            transition: background 0.2s;
-            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            font-size: 1em;
         }
         
         .file-item:hover {
             background: #f0f0f0;
             border-left-color: var(--secondary-color);
+            transform: translateX(5px);
         }
         
         .file-item.selected {
             background: var(--secondary-color);
             color: white;
-        }
-        
-        .excel-container {
-            overflow: auto;
-            max-height: 600px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin-top: 20px;
-            display: none;
+            border-left-color: var(--primary-color);
         }
         
         .toolbar {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin: 15px 0;
-            padding: 15px;
+            margin: 20px 0;
+            padding: 18px;
             background: #f8f9fa;
             border-radius: 8px;
+            align-items: center;
         }
         
         .search-results {
@@ -276,27 +360,30 @@
         .results-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             flex-wrap: wrap;
         }
         
         .results-count {
             font-weight: bold;
             color: var(--primary-color);
+            font-size: 1.1em;
         }
         
         .navigation-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            align-items: center;
         }
         
         .nav-button {
-            padding: 8px 15px;
+            padding: 10px 18px;
             background: var(--secondary-color);
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
         }
         
         .nav-button:hover {
@@ -306,40 +393,41 @@
         .current-result {
             font-weight: bold;
             color: var(--warning-color);
-            font-size: 1.1em;
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="app-header">
-            <h1 class="app-title">تصويب WAY</h1>
-            <p class="app-subtitle">محرر Excel المتقدم مع البحث والحفظ التلقائي</p>
+            <h1 class="app-title">WAY Correcter</h1>
         </div>
         
         <div class="control-panel">
-            <div class="left-panel">
+            <div class="github-section">
+                <h3 class="section-title">🔐 بيانات GitHub</h3>
                 <div class="control-group">
-                    <label for="token">رمز الوصول إلى GitHub</label>
-                    <input type="password" id="token" placeholder="أدخل الـ Token الخاص بك" style="width: 100%;">
+                    <label for="token">Token</label>
+                    <input type="password" id="token" placeholder="أدخل الـ Token">
                 </div>
                 
                 <div class="control-group">
                     <label for="repo-owner">مالك المستودع</label>
-                    <input type="text" id="repo-owner" value="webdr-creator" readonly style="width: 100%;">
+                    <input type="text" id="repo-owner" placeholder="أدخل اسم المالك">
                 </div>
                 
                 <div class="control-group">
                     <label for="repo-name">اسم المستودع</label>
-                    <input type="text" id="repo-name" value="Excel" readonly style="width: 100%;">
+                    <input type="text" id="repo-name" placeholder="أدخل اسم المستودع">
                 </div>
                 
-                <button onclick="loadRepository()" id="load-repo-btn" style="width: 100%;">
+                <button onclick="loadRepository()" id="load-repo-btn">
                     <span>🔄</span> تحميل قائمة الملفات
                 </button>
             </div>
             
-            <div class="right-panel">
+            <div class="files-section">
+                <h3 class="section-title">📁 ملفات Excel</h3>
                 <div class="control-group">
                     <label>اختر ملف Excel</label>
                     <div class="file-list" id="file-list">
@@ -351,7 +439,7 @@
                 
                 <div class="control-group">
                     <label for="sheet-select">اختر الورقة</label>
-                    <select id="sheet-select" onchange="changeSheet()" disabled style="width: 100%;">
+                    <select id="sheet-select" onchange="changeSheet()" disabled>
                         <option value="">-- اختر ورقة --</option>
                     </select>
                 </div>
@@ -360,7 +448,7 @@
         
         <div class="auto-save-section">
             <label>
-                <input type="checkbox" id="auto-save"> حفظ تلقائي 7s (يتم الحفظ بعد 7 ثواني من التعديل)
+                <input type="checkbox" id="auto-save" checked> حفظ تلقائي
             </label>
             <span id="auto-save-status"></span>
         </div>
@@ -388,17 +476,34 @@
             </div>
         </div>
         
+        <div class="edit-section" id="edit-section">
+            <h3 style="margin-top: 0; color: #4CAF50;">✏️ تعديل المحتوى</h3>
+            <textarea class="edit-textarea" id="edit-textarea" placeholder="المحتوى الحالي للخانة المحددة..."></textarea>
+            <div class="edit-buttons">
+                <button onclick="saveCellEdit()" style="background: #4CAF50;">💾 حفظ التعديل</button>
+                <button onclick="cancelCellEdit()" style="background: #f44336;">❌ إلغاء</button>
+            </div>
+        </div>
+        
+        <div class="zoom-controls">
+            <span>🔍 التحكم بالعرض:</span>
+            <button class="zoom-button" onclick="zoomOut()">➖</button>
+            <span class="zoom-level" id="zoom-level">100%</span>
+            <button class="zoom-button" onclick="zoomIn()">➕</button>
+            <span style="margin-left: auto;">📏 التمرير: ← → ↑ ↓</span>
+        </div>
+        
         <div class="toolbar">
             <button onclick="loadSelectedFile()" id="load-file-btn" disabled>📂 تحميل الملف المحدد</button>
             <button onclick="saveFile()" id="save-btn" disabled>💾 حفظ على GitHub</button>
             <button onclick="addRow()">➕ إضافة صف</button>
             <button onclick="addColumn()">➕ إضافة عمود</button>
-            <button onclick="exportToCSV()">📊 تصدير كـ CSV</button>
+            <button onclick="exportToXLSX()">📊 تصدير كـ XLSX</button>
         </div>
         
         <div id="status"></div>
         
-        <div class="excel-container" id="excel-container">
+        <div class="excel-wrapper" id="excel-wrapper">
             <table id="excel-table"></table>
         </div>
     </div>
@@ -408,11 +513,12 @@
         let currentWorkbook = null;
         let originalWorkbook = null;
         let fileSha = '';
-        let autoSaveTimer = null;
         let isModified = false;
         let currentFileName = '';
         let searchResults = [];
         let currentSearchIndex = -1;
+        let currentZoom = 100;
+        let selectedCell = null;
 
         // دالة لنسخ الـ Workbook
         function copyWorkbook(workbook) {
@@ -426,14 +532,39 @@
             return newWorkbook;
         }
 
+        // Zoom In
+        function zoomIn() {
+            if (currentZoom < 200) {
+                currentZoom += 10;
+                updateZoom();
+            }
+        }
+
+        // Zoom Out
+        function zoomOut() {
+            if (currentZoom > 50) {
+                currentZoom -= 10;
+                updateZoom();
+            }
+        }
+
+        // تحديث مستوى Zoom
+        function updateZoom() {
+            const table = document.getElementById('excel-table');
+            const zoomLevel = document.getElementById('zoom-level');
+            
+            table.style.transform = `scale(${currentZoom / 100})`;
+            zoomLevel.textContent = `${currentZoom}%`;
+        }
+
         // تحميل قائمة الملفات من المستودع
         async function loadRepository() {
             const token = document.getElementById('token').value;
             const owner = document.getElementById('repo-owner').value;
             const repo = document.getElementById('repo-name').value;
             
-            if (!token) {
-                showStatus('❌ أدخل الـ Token أولاً', 'error');
+            if (!token || !owner || !repo) {
+                showStatus('❌ أدخل جميع بيانات GitHub', 'error');
                 return;
             }
 
@@ -478,15 +609,11 @@
 
         // اختيار ملف من القائمة
         function selectFile(fileName, filePath) {
-            // إزالة التحديد من جميع العناصر
             document.querySelectorAll('.file-item').forEach(item => {
                 item.classList.remove('selected');
             });
             
-            // إضافة التحديد للعنصر المختار
             event.target.classList.add('selected');
-            
-            // تمكين زر تحميل الملف
             document.getElementById('load-file-btn').disabled = false;
             currentFileName = fileName;
             
@@ -535,7 +662,7 @@
                 // عرض الجدول
                 displaySheet(currentWorkbook.SheetNames[0]);
                 
-                document.getElementById('excel-container').style.display = 'block';
+                document.getElementById('excel-wrapper').style.display = 'block';
                 document.getElementById('save-btn').disabled = false;
                 document.getElementById('sheet-select').disabled = false;
                 
@@ -565,7 +692,7 @@
             const selectedSheet = document.getElementById('sheet-select').value;
             if (selectedSheet) {
                 displaySheet(selectedSheet);
-                clearSearch(); // مسح نتائج البحث عند تغيير الورقة
+                clearSearch();
             }
         }
 
@@ -580,28 +707,60 @@
             const html = XLSX.utils.sheet_to_html(worksheet);
             document.getElementById('excel-table').innerHTML = html;
             
-            makeCellsEditable();
+            makeCellsClickable();
         }
 
-        // جعل الخلايا قابلة للتعديل
-        function makeCellsEditable() {
+        // جعل الخلايا قابلة للنقر
+        function makeCellsClickable() {
             const cells = document.querySelectorAll('#excel-table td');
             cells.forEach(cell => {
-                cell.setAttribute('contenteditable', 'true');
-                
-                cell.addEventListener('input', function() {
-                    isModified = true;
-                    document.getElementById('save-btn').style.background = '#ff9800';
-                    document.getElementById('save-btn').innerHTML = '💾 حفظ التغييرات 🟡';
+                cell.addEventListener('click', function() {
+                    // إزالة التحديد من جميع الخلايا
+                    document.querySelectorAll('#excel-table td').forEach(c => {
+                        c.classList.remove('selected-cell');
+                    });
                     
-                    // الحفظ التلقائي بعد 7 ثواني
-                    if (document.getElementById('auto-save').checked) {
-                        clearTimeout(autoSaveTimer);
-                        autoSaveTimer = setTimeout(autoSave, 7000);
-                        document.getElementById('auto-save-status').textContent = '⏳ سيتم الحفظ تلقائياً بعد 7 ثواني...';
-                    }
+                    // تحديد الخلية المختارة
+                    this.classList.add('selected-cell');
+                    selectedCell = this;
+                    
+                    // عرض محتوى الخلية في مربع التعديل
+                    document.getElementById('edit-textarea').value = this.textContent;
+                    document.getElementById('edit-section').style.display = 'block';
+                    
+                    // تمرير إلى مربع التعديل
+                    document.getElementById('edit-textarea').focus();
                 });
             });
+        }
+
+        // حفظ تعديل الخلية
+        function saveCellEdit() {
+            if (!selectedCell) return;
+            
+            const newValue = document.getElementById('edit-textarea').value;
+            selectedCell.textContent = newValue;
+            
+            isModified = true;
+            document.getElementById('save-btn').style.background = '#ff9800';
+            document.getElementById('save-btn').innerHTML = '💾 حفظ التغييرات 🟡';
+            
+            // حفظ تلقائي فوري
+            if (document.getElementById('auto-save').checked) {
+                saveFile();
+            }
+            
+            document.getElementById('edit-section').style.display = 'none';
+            showStatus('✅ تم حفظ تعديل الخلية', 'success');
+        }
+
+        // إلغاء التعديل
+        function cancelCellEdit() {
+            document.getElementById('edit-section').style.display = 'none';
+            if (selectedCell) {
+                selectedCell.classList.remove('selected-cell');
+                selectedCell = null;
+            }
         }
 
         // البحث في الورقة
@@ -638,7 +797,6 @@
             document.getElementById('search-results').style.display = 'block';
             showStatus(`✅ تم العثور على ${searchResults.length} نتيجة`, 'success');
             
-            // عرض أول نتيجة
             nextResult();
         }
 
@@ -660,7 +818,6 @@
 
         // تمييز نتيجة البحث الحالية
         function highlightSearchResult() {
-            // إزالة التمييز من جميع الخلايا
             document.querySelectorAll('#excel-table td').forEach(cell => {
                 cell.classList.remove('search-highlight');
             });
@@ -688,14 +845,6 @@
             searchResults = [];
             currentSearchIndex = -1;
             showStatus('🗑️ تم مسح نتائج البحث', 'success');
-        }
-
-        // الحفظ التلقائي
-        function autoSave() {
-            if (isModified && document.getElementById('auto-save').checked) {
-                document.getElementById('auto-save-status').textContent = '💾 جاري الحفظ التلقائي...';
-                saveFile();
-            }
         }
 
         // حفظ الملف على GitHub
@@ -740,7 +889,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: `تصويب WAY - تحديث الملف: ${new Date().toLocaleString()}`,
+                        message: `WAY Correcter - تحديث الملف: ${new Date().toLocaleString()}`,
                         content: base64Content,
                         sha: fileSha
                     })
@@ -757,7 +906,7 @@
                 document.getElementById('save-btn').style.background = '';
                 document.getElementById('save-btn').innerHTML = '💾 حفظ على GitHub';
                 document.getElementById('save-btn').disabled = false;
-                document.getElementById('auto-save-status').textContent = '';
+                document.getElementById('auto-save-status').textContent = '✅ تم الحفظ';
                 
                 showStatus('✅ تم حفظ التغييرات على GitHub بنجاح!', 'success');
                 
@@ -839,25 +988,12 @@
             showStatus('✅ تم إضافة عمود جديد', 'success');
         }
 
-        // تصدير إلى CSV
-        function exportToCSV() {
+        // تصدير إلى XLSX
+        function exportToXLSX() {
             if (!currentWorkbook) return;
             
-            const sheetName = document.getElementById('sheet-select').value;
-            const worksheet = currentWorkbook.Sheets[sheetName];
-            const csv = XLSX.utils.sheet_to_csv(worksheet);
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `${currentFileName.replace('.xlsx', '')}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showStatus('✅ تم تصدير الملف كـ CSV', 'success');
+            XLSX.writeFile(currentWorkbook, `${currentFileName.replace('.xlsx', '')}_exported.xlsx`);
+            showStatus('✅ تم تصدير الملف كـ XLSX', 'success');
         }
 
         // عرض رسائل الحالة
@@ -872,7 +1008,7 @@
             }
         }
 
-        // تحذير عند مغادرة الصفحة مع وجود تغييرات غير محفوظة
+        // تحذير عند مغادرة الصفحة
         window.addEventListener('beforeunload', (event) => {
             if (isModified) {
                 event.preventDefault();
@@ -880,15 +1016,18 @@
             }
         });
 
-        // تمكين إدخال البحث بالضغط على Enter
+        // البحث بالضغط على Enter
         document.getElementById('search-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                searchInSheet();
-            }
+            if (e.key === 'Enter') searchInSheet();
         });
 
-        // تركيز على حقل البحث عند تحميل الصفحة
-        document.getElementById('search-input').focus();
+        // حفظ بالضغط على Ctrl+S
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveFile();
+            }
+        });
     </script>
 </body>
 </html>
