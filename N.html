@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محرر ملف Excel</title>
+    <title>محرر وعارض ملف Excel</title>
+    <!-- إضافة مكتبة SheetJS لقراءة ملفات Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -30,7 +32,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background-color: white;
             border-radius: 10px;
@@ -72,7 +74,7 @@
             font-weight: 600;
         }
         
-        input, textarea, button {
+        input, textarea, button, select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -87,6 +89,7 @@
             cursor: pointer;
             font-weight: 600;
             transition: background-color 0.3s;
+            margin: 5px 0;
         }
         
         button:hover {
@@ -110,24 +113,73 @@
             margin-bottom: 20px;
         }
         
-        .editor-container {
+        .excel-viewer {
+            margin-top: 20px;
+            overflow: auto;
+            max-height: 600px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            overflow: hidden;
+        }
+        
+        .sheet-tabs {
+            display: flex;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        
+        .sheet-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-right: 1px solid #ddd;
+            white-space: nowrap;
+        }
+        
+        .sheet-tab.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        .excel-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            position: sticky;
+            top: 0;
+        }
+        
+        .excel-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .excel-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .excel-table tr:hover {
+            background-color: #e3f2fd;
         }
         
         .editor-toolbar {
             background-color: #f8f9fa;
             padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
             display: flex;
             gap: 10px;
-        }
-        
-        .editor-content {
-            min-height: 400px;
-            padding: 15px;
-            outline: none;
+            flex-wrap: wrap;
         }
         
         .status-message {
@@ -147,6 +199,12 @@
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
         }
         
         .loading {
@@ -170,6 +228,13 @@
             100% { transform: rotate(360deg); }
         }
         
+        .view-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -178,19 +243,23 @@
             .editor-toolbar {
                 flex-direction: column;
             }
+            
+            .view-options {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>محرر ملف Excel على GitHub</h1>
-            <p class="description">هذه الأداة تسمح لك بتعديل ملف Excel الموجود في مستودع GitHub الخاص بك</p>
+            <h1>عارض ومحرر ملف Excel على GitHub</h1>
+            <p class="description">هذه الأداة تسمح لك بعرض وتعديل ملف Excel الموجود في مستودع GitHub الخاص بك</p>
         </header>
         
         <section class="auth-section">
             <h2>معلومات المصادقة</h2>
-            <p>للتعديل على الملف، تحتاج إلى توفير رمز الوصول الشخصي (Personal Access Token) من GitHub</p>
+            <p>لعرض وتعديل الملف، تحتاج إلى توفير رمز الوصول الشخصي (Personal Access Token) من GitHub</p>
             
             <div class="form-group">
                 <label for="github-token">رمز الوصول الشخصي (GitHub Personal Access Token)</label>
@@ -200,12 +269,12 @@
             
             <div class="form-group">
                 <label for="repo-owner">مالك المستودع (Repository Owner)</label>
-                <input type="text" id="repo-owner" placeholder="اسم المستخدم أو المنظمة">
+                <input type="text" id="repo-owner" value="webdr-creator" placeholder="اسم المستخدم أو المنظمة">
             </div>
             
             <div class="form-group">
                 <label for="repo-name">اسم المستودع (Repository Name)</label>
-                <input type="text" id="repo-name" placeholder="اسم المستودع">
+                <input type="text" id="repo-name" value="webdr-creator.github.io" placeholder="اسم المستودع">
             </div>
             
             <div class="form-group">
@@ -213,12 +282,12 @@
                 <input type="text" id="file-path" value="Excel/MCQD.XLSX" placeholder="مسار الملف">
             </div>
             
-            <button id="load-file-btn">تحميل الملف</button>
+            <button id="load-file-btn">تحميل وعرض الملف</button>
         </section>
         
         <div class="loading" id="loading-indicator">
             <div class="spinner"></div>
-            <p>جاري تحميل البيانات...</p>
+            <p>جاري تحميل وعرض البيانات...</p>
         </div>
         
         <section class="editor-section" id="editor-section">
@@ -227,15 +296,24 @@
                 <p id="file-info-text"></p>
             </div>
             
-            <div class="editor-container">
-                <div class="editor-toolbar">
-                    <button id="save-btn">حفظ التغييرات</button>
-                    <button id="download-btn">تحميل الملف</button>
-                    <button id="reset-btn">إعادة تعيين</button>
-                </div>
-                <div class="editor-content" id="editor" contenteditable="true">
-                    <!-- سيتم تحميل محتوى الملف هنا -->
-                </div>
+            <div class="view-options">
+                <label for="sheet-select">اختر الورقة:</label>
+                <select id="sheet-select"></select>
+                
+                <button id="download-btn">تحميل الملف الأصلي</button>
+                <button id="export-json-btn">تصدير كـ JSON</button>
+                <button id="export-csv-btn">تصدير كـ CSV</button>
+            </div>
+            
+            <div class="editor-toolbar">
+                <button id="save-btn">حفظ التغييرات على GitHub</button>
+                <button id="add-row-btn">إضافة صف</button>
+                <button id="add-col-btn">إضافة عمود</button>
+                <button id="reset-btn">إعادة تعيين</button>
+            </div>
+            
+            <div class="excel-viewer" id="excel-viewer">
+                <!-- سيتم عرض جدول Excel هنا -->
             </div>
             
             <div class="status-message" id="status-message"></div>
@@ -250,17 +328,24 @@
         const filePathInput = document.getElementById('file-path');
         const loadFileBtn = document.getElementById('load-file-btn');
         const editorSection = document.getElementById('editor-section');
-        const editor = document.getElementById('editor');
         const saveBtn = document.getElementById('save-btn');
         const downloadBtn = document.getElementById('download-btn');
+        const exportJsonBtn = document.getElementById('export-json-btn');
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        const addRowBtn = document.getElementById('add-row-btn');
+        const addColBtn = document.getElementById('add-col-btn');
         const resetBtn = document.getElementById('reset-btn');
+        const sheetSelect = document.getElementById('sheet-select');
         const statusMessage = document.getElementById('status-message');
         const loadingIndicator = document.getElementById('loading-indicator');
         const fileInfoText = document.getElementById('file-info-text');
+        const excelViewer = document.getElementById('excel-viewer');
         
         // متغيرات التطبيق
-        let originalContent = '';
+        let originalWorkbook = null;
+        let currentWorkbook = null;
         let fileSha = '';
+        let currentSheetName = '';
         
         // حدث تحميل الملف
         loadFileBtn.addEventListener('click', async () => {
@@ -276,36 +361,52 @@
             
             try {
                 loadingIndicator.style.display = 'block';
+                loadFileBtn.disabled = true;
                 
-                // جلب معلومات الملف من GitHub API
-                const fileInfo = await getFileFromGitHub(token, owner, repo, path);
+                // جلب الملف من GitHub
+                const fileData = await getFileFromGitHub(token, owner, repo, path);
                 
-                if (fileInfo) {
-                    // حفظ SHA للملف (مطلوب للتحديث)
-                    fileSha = fileInfo.sha;
+                if (fileData) {
+                    fileSha = fileData.sha;
                     
-                    // فك تشفير محتوى Base64
-                    const content = atob(fileInfo.content.replace(/\s/g, ''));
+                    // تحويل محتوى Base64 إلى ArrayBuffer
+                    const content = base64ToArrayBuffer(fileData.content);
                     
-                    // حفظ المحتوى الأصلي
-                    originalContent = content;
+                    // قراءة ملف Excel باستخدام SheetJS
+                    const workbook = XLSX.read(content, { type: 'array' });
                     
-                    // عرض المحتوى في المحرر
-                    editor.innerHTML = content;
+                    // حفظ النسخة الأصلية والحالية
+                    originalWorkbook = workbook;
+                    currentWorkbook = XLSX.utils.book_copy(workbook);
                     
-                    // تحديث معلومات الملف
-                    fileInfoText.textContent = `الملف: ${path} | الحجم: ${formatFileSize(content.length)}`;
+                    // عرض معلومات الملف
+                    fileInfoText.textContent = `الملف: ${path} | الحجم: ${formatFileSize(content.byteLength)} | عدد الأوراق: ${workbook.SheetNames.length}`;
+                    
+                    // تعبئة قائمة الأوراق
+                    populateSheetSelect(workbook.SheetNames);
+                    
+                    // عرض الورقة الأولى
+                    displaySheet(workbook.SheetNames[0]);
                     
                     // إظهار قسم المحرر
                     editorSection.style.display = 'block';
                     
-                    showStatus('تم تحميل الملف بنجاح', 'success');
+                    showStatus('تم تحميل وعرض الملف بنجاح', 'success');
                 }
             } catch (error) {
                 console.error('Error loading file:', error);
                 showStatus(`خطأ في تحميل الملف: ${error.message}`, 'error');
             } finally {
                 loadingIndicator.style.display = 'none';
+                loadFileBtn.disabled = false;
+            }
+        });
+        
+        // حدث تغيير الورقة
+        sheetSelect.addEventListener('change', () => {
+            const selectedSheet = sheetSelect.value;
+            if (selectedSheet) {
+                displaySheet(selectedSheet);
             }
         });
         
@@ -315,15 +416,9 @@
             const owner = repoOwnerInput.value.trim();
             const repo = repoNameInput.value.trim();
             const path = filePathInput.value.trim();
-            const newContent = editor.innerHTML;
             
             if (!token || !owner || !repo || !path) {
                 showStatus('يرجى ملء جميع الحقول', 'error');
-                return;
-            }
-            
-            if (newContent === originalContent) {
-                showStatus('لم تقم بإجراء أي تغييرات', 'warning');
                 return;
             }
             
@@ -331,20 +426,19 @@
                 loadingIndicator.style.display = 'block';
                 saveBtn.disabled = true;
                 
-                // تشفير المحتوى إلى Base64
-                const encodedContent = btoa(newContent);
+                // تحويل Workbook إلى ArrayBuffer
+                const arrayBuffer = XLSX.write(currentWorkbook, { bookType: 'xlsx', type: 'array' });
+                
+                // تحويل ArrayBuffer إلى Base64
+                const base64Content = arrayBufferToBase64(arrayBuffer);
                 
                 // تحديث الملف على GitHub
-                const result = await updateFileOnGitHub(token, owner, repo, path, encodedContent, fileSha);
+                const result = await updateFileOnGitHub(token, owner, repo, path, base64Content, fileSha);
                 
                 if (result) {
-                    // تحديث SHA الجديد
                     fileSha = result.content.sha;
-                    
-                    // تحديث المحتوى الأصلي
-                    originalContent = newContent;
-                    
-                    showStatus('تم حفظ التغييرات بنجاح', 'success');
+                    originalWorkbook = XLSX.utils.book_copy(currentWorkbook);
+                    showStatus('تم حفظ التغييرات بنجاح على GitHub', 'success');
                 }
             } catch (error) {
                 console.error('Error saving file:', error);
@@ -355,29 +449,155 @@
             }
         });
         
-        // حدث تحميل الملف
+        // حدث تحميل الملف الأصلي
         downloadBtn.addEventListener('click', () => {
-            const content = editor.innerHTML;
-            const blob = new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filePathInput.value.split('/').pop() || 'file.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            if (!currentWorkbook) return;
+            
+            XLSX.writeFile(currentWorkbook, filePathInput.value.split('/').pop() || 'file.xlsx');
+            showStatus('تم بدء تحميل الملف', 'success');
         });
         
-        // حدث إعادة تعيين المحتوى
+        // حدث تصدير كـ JSON
+        exportJsonBtn.addEventListener('click', () => {
+            if (!currentWorkbook || !currentSheetName) return;
+            
+            const worksheet = currentWorkbook.Sheets[currentSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+            
+            const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+            downloadBlob(blob, `${currentSheetName}.json`);
+            showStatus('تم تصدير البيانات كـ JSON', 'success');
+        });
+        
+        // حدث تصدير كـ CSV
+        exportCsvBtn.addEventListener('click', () => {
+            if (!currentWorkbook || !currentSheetName) return;
+            
+            const worksheet = currentWorkbook.Sheets[currentSheetName];
+            const csvData = XLSX.utils.sheet_to_csv(worksheet);
+            
+            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+            downloadBlob(blob, `${currentSheetName}.csv`);
+            showStatus('تم تصدير البيانات كـ CSV', 'success');
+        });
+        
+        // حدث إضافة صف
+        addRowBtn.addEventListener('click', () => {
+            if (!currentWorkbook || !currentSheetName) return;
+            
+            const worksheet = currentWorkbook.Sheets[currentSheetName];
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            range.e.r += 1; // زيادة عدد الصفوف
+            
+            // إضافة خلية فارغة في آخر صف
+            const newRow = range.e.r;
+            const cols = range.e.c;
+            
+            for (let c = 0; c <= cols; c++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: newRow, c: c });
+                if (!worksheet[cellAddress]) {
+                    worksheet[cellAddress] = { v: '', t: 's' };
+                }
+            }
+            
+            worksheet['!ref'] = XLSX.utils.encode_range(range);
+            displaySheet(currentSheetName);
+            showStatus('تم إضافة صف جديد', 'success');
+        });
+        
+        // حدث إضافة عمود
+        addColBtn.addEventListener('click', () => {
+            if (!currentWorkbook || !currentSheetName) return;
+            
+            const worksheet = currentWorkbook.Sheets[currentSheetName];
+            const range = XLSX.utils.decode_range(worksheet['!ref']);
+            range.e.c += 1; // زيادة عدد الأعمدة
+            
+            // إضافة خلية فارغة في آخر عمود
+            const newCol = range.e.c;
+            const rows = range.e.r;
+            
+            for (let r = 0; r <= rows; r++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: r, c: newCol });
+                if (!worksheet[cellAddress]) {
+                    worksheet[cellAddress] = { v: '', t: 's' };
+                }
+            }
+            
+            worksheet['!ref'] = XLSX.utils.encode_range(range);
+            displaySheet(currentSheetName);
+            showStatus('تم إضافة عمود جديد', 'success');
+        });
+        
+        // حدث إعادة تعيين
         resetBtn.addEventListener('click', () => {
             if (confirm('هل تريد حقًا إعادة تعيين جميع التغييرات؟')) {
-                editor.innerHTML = originalContent;
-                showStatus('تم إعادة تعيين المحتوى', 'success');
+                currentWorkbook = XLSX.utils.book_copy(originalWorkbook);
+                displaySheet(currentSheetName);
+                showStatus('تم إعادة تعيين جميع التغييرات', 'success');
             }
         });
         
-        // دالة لجلب الملف من GitHub
+        // دالة لعرض ورقة Excel
+        function displaySheet(sheetName) {
+            if (!currentWorkbook) return;
+            
+            currentSheetName = sheetName;
+            const worksheet = currentWorkbook.Sheets[sheetName];
+            const htmlString = XLSX.utils.sheet_to_html(worksheet, { editable: true });
+            
+            excelViewer.innerHTML = htmlString;
+            
+            // جعل الخلايا قابلة للتعديل
+            makeCellsEditable();
+        }
+        
+        // دالة لجعل الخلايا قابلة للتعديل
+        function makeCellsEditable() {
+            const cells = excelViewer.querySelectorAll('td');
+            cells.forEach(cell => {
+                cell.setAttribute('contenteditable', 'true');
+                
+                cell.addEventListener('blur', function() {
+                    updateWorkbookFromTable(this);
+                });
+            });
+        }
+        
+        // دالة لتحديث Workbook من الجدول
+        function updateWorkbookFromTable(cell) {
+            if (!currentWorkbook || !currentSheetName) return;
+            
+            const worksheet = currentWorkbook.Sheets[currentSheetName];
+            const table = excelViewer.querySelector('table');
+            const rows = table.rows;
+            
+            for (let r = 0; r < rows.length; r++) {
+                for (let c = 0; c < rows[r].cells.length; c++) {
+                    const cellAddress = XLSX.utils.encode_cell({ r: r, c: c });
+                    const cellValue = rows[r].cells[c].textContent;
+                    
+                    if (!worksheet[cellAddress]) {
+                        worksheet[cellAddress] = { t: 's', v: cellValue };
+                    } else {
+                        worksheet[cellAddress].v = cellValue;
+                    }
+                }
+            }
+        }
+        
+        // دالة لتعبيئة قائمة الأوراق
+        function populateSheetSelect(sheetNames) {
+            sheetSelect.innerHTML = '';
+            sheetNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                sheetSelect.appendChild(option);
+            });
+        }
+        
+        // الدوال المساعدة
         async function getFileFromGitHub(token, owner, repo, path) {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             
@@ -395,7 +615,6 @@
             return await response.json();
         }
         
-        // دالة لتحديث الملف على GitHub
         async function updateFileOnGitHub(token, owner, repo, path, content, sha) {
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
             
@@ -420,27 +639,51 @@
             return await response.json();
         }
         
-        // دالة لعرض رسائل الحالة
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64.replace(/\s/g, ''));
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+        
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+        
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
         function showStatus(message, type) {
             statusMessage.textContent = message;
             statusMessage.className = `status-message ${type}`;
             statusMessage.style.display = 'block';
             
-            // إخفاء الرسالة بعد 5 ثواني
             setTimeout(() => {
                 statusMessage.style.display = 'none';
             }, 5000);
-        }
-        
-        // دالة لتنسيق حجم الملف
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
     </script>
 </body>
