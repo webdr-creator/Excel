@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>WAY Correcter - محرر Excel</title>
+    <title>WAY Corrector - محرر Excel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -20,6 +20,7 @@
             background: #f5f5f5; 
             margin: 0;
             zoom: 100%;
+            overflow-x: hidden;
         }
         
         .container { 
@@ -29,6 +30,7 @@
             padding: 30px; 
             border-radius: 15px;
             box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
         
         .app-header {
@@ -58,20 +60,26 @@
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             border: 2px solid #ddd;
+            box-sizing: border-box;
+            max-width: 100%;
+            overflow: hidden;
         }
         
         @media (max-width: 968px) {
             .control-panel {
                 grid-template-columns: 1fr;
                 gap: 20px;
+                padding: 20px;
             }
         }
         
-        .github-section, .files-section {
+        .user-section, .files-section {
             padding: 20px;
             background: white;
             border-radius: 8px;
             border: 1px solid #ddd;
+            box-sizing: border-box;
+            max-width: 100%;
         }
         
         .section-title {
@@ -85,6 +93,7 @@
         
         .control-group {
             margin-bottom: 20px;
+            max-width: 100%;
         }
         
         label {
@@ -102,6 +111,8 @@
             font-size: 1em;
             transition: all 0.3s ease;
             width: 100%;
+            box-sizing: border-box;
+            max-width: 100%;
         }
         
         input:focus, select:focus {
@@ -123,6 +134,8 @@
             white-space: nowrap;
             font-size: 1em;
             padding: 14px 20px;
+            width: auto;
+            min-width: 140px;
         }
         
         button:hover {
@@ -145,6 +158,10 @@
             margin: 15px 0;
             border-left: 4px solid var(--secondary-color);
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
         
         .search-section {
@@ -160,13 +177,15 @@
             gap: 15px;
             align-items: center;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         
         .search-input {
             flex: 1;
-            width: 100%;
+            min-width: 300px;
             padding: 16px;
             font-size: 1.1em;
+            box-sizing: border-box;
         }
         
         .search-buttons {
@@ -198,12 +217,14 @@
             font-size: 1.1em;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             resize: vertical;
+            box-sizing: border-box;
         }
         
         .edit-buttons {
             display: flex;
             gap: 12px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
         
         .status {
@@ -219,33 +240,6 @@
         .warning { background: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
         .loading { background: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
         
-        .zoom-controls {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            align-items: center;
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-        }
-        
-        .zoom-button {
-            padding: 10px 15px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.2em;
-        }
-        
-        .zoom-level {
-            font-weight: bold;
-            color: var(--primary-color);
-            min-width: 60px;
-            text-align: center;
-        }
-        
         .excel-wrapper {
             border: 2px solid #ddd;
             border-radius: 8px;
@@ -253,6 +247,12 @@
             max-height: 600px;
             margin-top: 15px;
             position: relative;
+            touch-action: pan-x pan-y;
+            cursor: grab;
+        }
+        
+        .excel-wrapper:active {
+            cursor: grabbing;
         }
         
         #excel-table {
@@ -261,15 +261,25 @@
             min-width: 800px;
             transform-origin: 0 0;
             transition: transform 0.3s ease;
+            font-size: 12px !important;
+        }
+        
+        #excel-table th,
+        #excel-table td {
+            font-size: 12px !important;
+            line-height: 1.2;
+            padding: 8px !important;
         }
         
         th, td {
             border: 1px solid #ddd;
-            padding: 14px;
+            padding: 10px;
             text-align: center;
-            min-width: 100px;
+            min-width: 80px;
             cursor: pointer;
             transition: background 0.3s;
+            font-size: 12px;
+            line-height: 1.2;
         }
         
         th {
@@ -279,10 +289,12 @@
             position: sticky;
             top: 0;
             z-index: 10;
+            font-size: 12px;
         }
         
         td {
             background: #fafafa;
+            font-size: 12px;
         }
         
         td:hover {
@@ -324,6 +336,7 @@
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
             font-size: 1em;
+            box-sizing: border-box;
         }
         
         .file-item:hover {
@@ -362,6 +375,7 @@
             align-items: center;
             gap: 20px;
             flex-wrap: wrap;
+            justify-content: space-between;
         }
         
         .results-count {
@@ -374,6 +388,7 @@
             display: flex;
             gap: 12px;
             align-items: center;
+            margin-left: auto;
         }
         
         .nav-button {
@@ -394,18 +409,29 @@
             font-weight: bold;
             color: var(--warning-color);
             font-size: 1.2em;
+            margin: 0 15px;
+        }
+        
+        .touch-hint {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="app-header">
-            <h1 class="app-title">WAY Correcter</h1>
+            <h1 class="app-title">WAY Corrector</h1>
         </div>
         
         <div class="control-panel">
-            <div class="github-section">
-                <h3 class="section-title">🔐 بيانات GitHub</h3>
+            <div class="user-section">
+                <h3 class="section-title">👤 بيانات المستخدم</h3>
                 <div class="control-group">
                     <label for="token">Token</label>
                     <input type="password" id="token" placeholder="أدخل الـ Token">
@@ -427,7 +453,7 @@
             </div>
             
             <div class="files-section">
-                <h3 class="section-title">📁 ملفات Excel</h3>
+                <h3 class="section-title">📁 الملفات</h3>
                 <div class="control-group">
                     <label>اختر ملف Excel</label>
                     <div class="file-list" id="file-list">
@@ -446,12 +472,21 @@
             </div>
         </div>
         
-        <div class="auto-save-section">
-            <label>
-                <input type="checkbox" id="auto-save" checked> حفظ تلقائي
-            </label>
-            <span id="auto-save-status"></span>
+        <div class="toolbar">
+            <button onclick="loadSelectedFile()" id="load-file-btn" disabled>📂 تحميل الملف المحدد</button>
+            <button onclick="saveFile()" id="save-btn" disabled>💾 حفظ على GitHub</button>
+            <button onclick="addRow()">➕ إضافة صف</button>
+            <button onclick="addColumn()">➕ إضافة عمود</button>
+            <button onclick="exportToXLSX()">📊 تصدير كـ XLSX</button>
+            
+            <div class="auto-save-section" style="margin: 0; margin-left: auto;">
+                <label>
+                    <input type="checkbox" id="auto-save"> حفظ تلقائي
+                </label>
+            </div>
         </div>
+        
+        <div id="status"></div>
         
         <div class="search-section">
             <h3 style="margin-top: 0; color: var(--primary-color);">🔍 البحث في الملف</h3>
@@ -469,7 +504,8 @@
                     <span class="results-count">تم العثور على <span id="search-count">0</span> نتيجة</span>
                     <div class="navigation-buttons">
                         <button onclick="prevResult()" class="nav-button">◀ السابق</button>
-                        <span>النتيجة <span id="current-result" class="current-result">0</span> من <span id="total-results">0</span></span>
+                        <span class="current-result" id="current-result">0</span>
+                        <span>من <span id="total-results">0</span></span>
                         <button onclick="nextResult()" class="nav-button">التالي ▶</button>
                     </div>
                 </div>
@@ -485,23 +521,9 @@
             </div>
         </div>
         
-        <div class="zoom-controls">
-            <span>🔍 التحكم بالعرض:</span>
-            <button class="zoom-button" onclick="zoomOut()">➖</button>
-            <span class="zoom-level" id="zoom-level">100%</span>
-            <button class="zoom-button" onclick="zoomIn()">➕</button>
-            <span style="margin-left: auto;">📏 التمرير: ← → ↑ ↓</span>
+        <div class="touch-hint">
+            💡 يمكنك التكبير/التصغير باستخدام إصبعين على الجدول (مثل خرائط Google)
         </div>
-        
-        <div class="toolbar">
-            <button onclick="loadSelectedFile()" id="load-file-btn" disabled>📂 تحميل الملف المحدد</button>
-            <button onclick="saveFile()" id="save-btn" disabled>💾 حفظ على GitHub</button>
-            <button onclick="addRow()">➕ إضافة صف</button>
-            <button onclick="addColumn()">➕ إضافة عمود</button>
-            <button onclick="exportToXLSX()">📊 تصدير كـ XLSX</button>
-        </div>
-        
-        <div id="status"></div>
         
         <div class="excel-wrapper" id="excel-wrapper">
             <table id="excel-table"></table>
@@ -517,8 +539,10 @@
         let currentFileName = '';
         let searchResults = [];
         let currentSearchIndex = -1;
-        let currentZoom = 100;
         let selectedCell = null;
+        let scale = 1;
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
 
         // دالة لنسخ الـ Workbook
         function copyWorkbook(workbook) {
@@ -532,29 +556,56 @@
             return newWorkbook;
         }
 
-        // Zoom In
-        function zoomIn() {
-            if (currentZoom < 200) {
-                currentZoom += 10;
-                updateZoom();
-            }
-        }
+        // إعداد Zoom باللمس
+        function setupTouchZoom() {
+            const wrapper = document.getElementById('excel-wrapper');
+            let initialDistance = null;
 
-        // Zoom Out
-        function zoomOut() {
-            if (currentZoom > 50) {
-                currentZoom -= 10;
-                updateZoom();
-            }
-        }
+            wrapper.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    initialDistance = getDistance(e.touches[0], e.touches[1]);
+                } else if (e.touches.length === 1) {
+                    isDragging = true;
+                    startX = e.touches[0].pageX - wrapper.offsetLeft;
+                    startY = e.touches[0].pageY - wrapper.offsetTop;
+                    scrollLeft = wrapper.scrollLeft;
+                    scrollTop = wrapper.scrollTop;
+                }
+            });
 
-        // تحديث مستوى Zoom
-        function updateZoom() {
-            const table = document.getElementById('excel-table');
-            const zoomLevel = document.getElementById('zoom-level');
-            
-            table.style.transform = `scale(${currentZoom / 100})`;
-            zoomLevel.textContent = `${currentZoom}%`;
+            wrapper.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 2 && initialDistance !== null) {
+                    e.preventDefault();
+                    const currentDistance = getDistance(e.touches[0], e.touches[1]);
+                    const zoomFactor = currentDistance / initialDistance;
+                    
+                    scale = Math.max(0.5, Math.min(2, scale * zoomFactor));
+                    document.getElementById('excel-table').style.transform = `scale(${scale})`;
+                    
+                    initialDistance = currentDistance;
+                } else if (isDragging && e.touches.length === 1) {
+                    e.preventDefault();
+                    const x = e.touches[0].pageX - wrapper.offsetLeft;
+                    const y = e.touches[0].pageY - wrapper.offsetTop;
+                    const walkX = (x - startX) * 2;
+                    const walkY = (y - startY) * 2;
+                    wrapper.scrollLeft = scrollLeft - walkX;
+                    wrapper.scrollTop = scrollTop - walkY;
+                }
+            });
+
+            wrapper.addEventListener('touchend', function(e) {
+                initialDistance = null;
+                isDragging = false;
+            });
+
+            function getDistance(touch1, touch2) {
+                return Math.hypot(
+                    touch1.pageX - touch2.pageX,
+                    touch1.pageY - touch2.pageY
+                );
+            }
         }
 
         // تحميل قائمة الملفات من المستودع
@@ -564,7 +615,7 @@
             const repo = document.getElementById('repo-name').value;
             
             if (!token || !owner || !repo) {
-                showStatus('❌ أدخل جميع بيانات GitHub', 'error');
+                showStatus('❌ أدخل جميع بيانات المستخدم', 'error');
                 return;
             }
 
@@ -598,7 +649,7 @@
                     `).join('');
                 }
                 
-                showStatus(`✅ تم تحميل ${excelFiles.length} ملف Excel`, 'success');
+                showStatus(`✅ تم تحميل ${excelFiles.length} ملف`, 'success');
                 
             } catch (error) {
                 showStatus(`❌ خطأ: ${error.message}`, 'error');
@@ -666,6 +717,9 @@
                 document.getElementById('save-btn').disabled = false;
                 document.getElementById('sheet-select').disabled = false;
                 
+                // إعداد Zoom باللمس
+                setupTouchZoom();
+                
                 showStatus(`✅ تم تحميل ${currentFileName} بنجاح!`, 'success');
                 
             } catch (error) {
@@ -707,7 +761,20 @@
             const html = XLSX.utils.sheet_to_html(worksheet);
             document.getElementById('excel-table').innerHTML = html;
             
+            // تطبيق حجم خط موحد
+            applyUniformFontSize();
+            
             makeCellsClickable();
+        }
+
+        // تطبيق حجم خط موحد
+        function applyUniformFontSize() {
+            const cells = document.querySelectorAll('#excel-table th, #excel-table td');
+            cells.forEach(cell => {
+                cell.style.fontSize = '12px';
+                cell.style.lineHeight = '1.2';
+                cell.style.padding = '8px';
+            });
         }
 
         // جعل الخلايا قابلة للنقر
@@ -889,7 +956,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: `WAY Correcter - تحديث الملف: ${new Date().toLocaleString()}`,
+                        message: `WAY Corrector - تحديث الملف: ${new Date().toLocaleString()}`,
                         content: base64Content,
                         sha: fileSha
                     })
@@ -906,7 +973,6 @@
                 document.getElementById('save-btn').style.background = '';
                 document.getElementById('save-btn').innerHTML = '💾 حفظ على GitHub';
                 document.getElementById('save-btn').disabled = false;
-                document.getElementById('auto-save-status').textContent = '✅ تم الحفظ';
                 
                 showStatus('✅ تم حفظ التغييرات على GitHub بنجاح!', 'success');
                 
@@ -1028,6 +1094,9 @@
                 saveFile();
             }
         });
+
+        // إعداد الحفظ التلقائي غير مفعل افتراضياً
+        document.getElementById('auto-save').checked = false;
     </script>
 </body>
 </html>
