@@ -81,7 +81,6 @@
         }
         
         input, button, select {
-            width: 100%;
             padding: 12px 15px;
             border: 2px solid #ddd;
             border-radius: 8px;
@@ -105,6 +104,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            white-space: nowrap;
         }
         
         button:hover {
@@ -130,10 +130,34 @@
         
         .search-section {
             background: #fff8e1;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
             border-left: 4px solid var(--warning-color);
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+        }
+        
+        .search-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-button {
+            padding: 15px 20px;
+            min-width: 120px;
         }
         
         .status {
@@ -185,6 +209,13 @@
             background: #ffeb3b !important;
             font-weight: bold;
             border: 2px solid #ff9800 !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
         
         .file-list {
@@ -236,9 +267,46 @@
         
         .search-results {
             background: #e3f2fd;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
             margin: 10px 0;
+            display: none;
+        }
+        
+        .results-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .results-count {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-button {
+            padding: 8px 15px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .nav-button:hover {
+            background: #2980b9;
+        }
+        
+        .current-result {
+            font-weight: bold;
+            color: var(--warning-color);
+            font-size: 1.1em;
         }
     </style>
 </head>
@@ -253,20 +321,20 @@
             <div class="left-panel">
                 <div class="control-group">
                     <label for="token">رمز الوصول إلى GitHub</label>
-                    <input type="password" id="token" placeholder="أدخل الـ Token الخاص بك">
+                    <input type="password" id="token" placeholder="أدخل الـ Token الخاص بك" style="width: 100%;">
                 </div>
                 
                 <div class="control-group">
                     <label for="repo-owner">مالك المستودع</label>
-                    <input type="text" id="repo-owner" value="webdr-creator" readonly>
+                    <input type="text" id="repo-owner" value="webdr-creator" readonly style="width: 100%;">
                 </div>
                 
                 <div class="control-group">
                     <label for="repo-name">اسم المستودع</label>
-                    <input type="text" id="repo-name" value="Excel" readonly>
+                    <input type="text" id="repo-name" value="Excel" readonly style="width: 100%;">
                 </div>
                 
-                <button onclick="loadRepository()" id="load-repo-btn">
+                <button onclick="loadRepository()" id="load-repo-btn" style="width: 100%;">
                     <span>🔄</span> تحميل قائمة الملفات
                 </button>
             </div>
@@ -283,7 +351,7 @@
                 
                 <div class="control-group">
                     <label for="sheet-select">اختر الورقة</label>
-                    <select id="sheet-select" onchange="changeSheet()" disabled>
+                    <select id="sheet-select" onchange="changeSheet()" disabled style="width: 100%;">
                         <option value="">-- اختر ورقة --</option>
                     </select>
                 </div>
@@ -298,16 +366,25 @@
         </div>
         
         <div class="search-section">
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="search-input" placeholder="ابحث عن كلمة أو عبارة..." style="flex: 1;">
-                <button onclick="searchInSheet()" id="search-btn">🔍 بحث</button>
-                <button onclick="clearSearch()" id="clear-search-btn">🗑️ مسح البحث</button>
+            <h3 style="margin-top: 0; color: var(--primary-color);">🔍 البحث في الملف</h3>
+            
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="اكتب الكلمة أو العبارة التي تريد البحث عنها..." class="search-input">
+                <div class="search-buttons">
+                    <button onclick="searchInSheet()" id="search-btn" class="search-button">🔍 بحث</button>
+                    <button onclick="clearSearch()" id="clear-search-btn" class="search-button">🗑️ مسح</button>
+                </div>
             </div>
-            <div id="search-results" class="search-results" style="display: none;">
-                <span id="search-count">0</span> نتيجة found - 
-                <button onclick="prevResult()">◀ السابق</button>
-                <span id="current-result">0</span>
-                <button onclick="nextResult()">التالي ▶</button>
+            
+            <div id="search-results" class="search-results">
+                <div class="results-info">
+                    <span class="results-count">تم العثور على <span id="search-count">0</span> نتيجة</span>
+                    <div class="navigation-buttons">
+                        <button onclick="prevResult()" class="nav-button">◀ السابق</button>
+                        <span>النتيجة <span id="current-result" class="current-result">0</span> من <span id="total-results">0</span></span>
+                        <button onclick="nextResult()" class="nav-button">التالي ▶</button>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -535,6 +612,11 @@
                 return;
             }
             
+            if (!currentWorkbook) {
+                showStatus('❌ قم بتحميل ملف أولاً', 'warning');
+                return;
+            }
+            
             const cells = document.querySelectorAll('#excel-table td');
             searchResults = [];
             currentSearchIndex = -1;
@@ -552,6 +634,7 @@
             }
             
             document.getElementById('search-count').textContent = searchResults.length;
+            document.getElementById('total-results').textContent = searchResults.length;
             document.getElementById('search-results').style.display = 'block';
             showStatus(`✅ تم العثور على ${searchResults.length} نتيجة`, 'success');
             
@@ -604,6 +687,7 @@
             document.getElementById('search-results').style.display = 'none';
             searchResults = [];
             currentSearchIndex = -1;
+            showStatus('🗑️ تم مسح نتائج البحث', 'success');
         }
 
         // الحفظ التلقائي
@@ -802,6 +886,9 @@
                 searchInSheet();
             }
         });
+
+        // تركيز على حقل البحث عند تحميل الصفحة
+        document.getElementById('search-input').focus();
     </script>
 </body>
 </html>
