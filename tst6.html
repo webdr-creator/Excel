@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WAY</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+body {
+    font-size: 16px;
+    background: #e0e0e0;
+    color: #333;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.container {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+    margin: 20px 0;
+    position: relative;
+}
+header {
+    background: #008CBA;
+    color: white;
+    padding: 18px 10px;
+    text-align: center;
+}
+h1 { font-size: 27px; margin-bottom: 3px; font-weight: bold; }
+
+.subject-name {
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 10px;
+    padding: 7px;
+    background: #b9e4f0;
+    border-radius: 7px;
+}
+
+.chapter-name {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #008CBA;
+    margin-bottom: 10px;
+    padding: 7px;
+    background: #f0fbfd;
+    border-radius: 7px;
+}
+
+.category-text {
+    text-align: center;
+    color: #006f94;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.progress-text {
+    text-align: center;
+    font-weight: bold;
+    color: #008CBA;
+    margin-bottom: 7px;
+    font-size: 13px;
+}
+
+/* باقي الأنماط الأساسية للتطبيق كما هي */
+.question-container {
+    margin-bottom: 18px;
+    padding: 13px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+}
+.option {
+    font-size: 15px;
+    padding: 9px;
+    background: #f8f8f8;
+    border: 2px solid #e0e0e0;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.option:hover {
+    border-color: #008CBA;
+    background: #eef7f1;
+}
+.solve-mode-btn.active {
+    color: #008CBA;
+}
+.question-explanation {
+    margin-top: 10px;
+    background: #e6f7fb;
+    padding: 10px;
+    border-radius: 7px;
+    border-right: 4px solid #008CBA;
+    font-size: 15px;
+    line-height: 1.5;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+<header><h1>WAY</h1></header>
+
+<div class="exam-section" id="exam-section">
+  <div class="subject-name" id="subject-name"></div>
+  <div class="chapter-name" id="chapter-name"></div>
+  <div class="category-text" id="category-text"></div>
+  <div class="progress-text">السؤال <span id="current-q">1</span> من <span id="total-qs">0</span></div>
+
+  <div class="question-container" id="question-container">
+    <div class="question-text" id="question-text"></div>
+    <div class="options-container" id="options-container"></div>
+    <div class="question-explanation" id="question-explanation" style="display:none;"></div>
+  </div>
+</div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // محاكاة القيم من الأعمدة 9 و10 و11
+    let currentSubject = "الفيزياء";
+    let col10Val = "الفصل الثالث";
+    let col11Val = "التصنيف: الحركة الدورانية";
+
+    // تعريف العناصر
+    const subjectNameElement = document.getElementById('subject-name');
+    const chapterNameElement = document.getElementById('chapter-name');
+    const categoryText = document.getElementById('category-text');
+
+    // عرض اسم المادة
+    subjectNameElement.textContent = currentSubject;
+
+    // عرض اسم الفصل
+    chapterNameElement.textContent = col10Val;
+
+    // عرض اسم التصنيف إن وُجد
+    if (col11Val && col11Val !== '' && col11Val !== 'الكل') {
+        categoryText.textContent = col11Val;
+    } else {
+        categoryText.textContent = '';
+    }
+
+    // باقي الكود الخاص بعرض الأسئلة (اختصار)
+    document.getElementById('question-text').textContent = "ما هو قانون نيوتن الأول؟";
+    const options = ["قانون القصور الذاتي", "قانون الجذب العام", "قانون الطاقة", "قانون القوة"];
+    const optionsContainer = document.getElementById('options-container');
+    options.forEach(opt => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.textContent = opt;
+        optionsContainer.appendChild(div);
+    });
+});
+</script>
+</body>
+</html>
