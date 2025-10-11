@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WAY</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+<style>
+body {
+    font-size: 16px;
+    background: #e0e0e0;
+    color: #333;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.container {
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    overflow: hidden;
+    margin: 20px 0;
+    position: relative;
+}
+header {
+    background: #008CBA;
+    color: white;
+    padding: 18px 10px 18px 10px;
+    text-align: center;
+}
+h1 { font-size: 27px; margin-bottom: 3px; font-weight: bold;}
+.header-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 13px;
+}
+.header-row .subject-chapter {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+.header-row div {
+    display: inline-block;
+    background: #008CBA;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+.category-name {
+    margin-top: 4px;
+}
+.progress-text { text-align: center; font-weight: bold; color: #008CBA; margin-bottom: 7px; font-size: 13px;}
+/* باقي تنسيقاتك الأصلية تبقى كما هي */
+</style>
+</head>
+<body>
+<audio id="click-audio" src="https://cdn.pixabay.com/audio/2022/11/16/audio_12bfa6f1e1.mp3"></audio>
+<div class="container">
+<header>
+<h1>WAY</h1>
+</header>
+
+<div class="subject-selection" id="subject-section" style="display: none;">
+<h2>اختر المادة:</h2>
+<div class="selection-container">
+<select id="subject-select"></select>
+<select id="column10-info"></select>
+<select id="column11-select"></select>
+</div>
+<button class="start-btn" id="start-btn">بدء الاختبار</button>
+</div>
+
+<div class="exam-section" id="exam-section">
+    <div class="header-row">
+        <div class="subject-chapter">
+            <div class="subject-name" id="subject-name"></div>
+            <div class="chapter-name" id="chapter-name"></div>
+        </div>
+        <div class="category-name" id="category-name"></div>
+    </div>
+
+    <div class="progress-text">السؤال <span id="current-q">1</span> من <span id="total-qs">0</span></div>
+
+    <div class="question-container" id="question-container">
+        <div class="question-text" id="question-text"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const subjectSelect = document.getElementById('subject-select');
+    const column10Info = document.getElementById('column10-info');
+    const column11Select = document.getElementById('column11-select');
+    const startBtn = document.getElementById('start-btn');
+    const subjectNameElement = document.getElementById('subject-name');
+    const chapterNameElement = document.getElementById('chapter-name');
+    const categoryNameElement = document.getElementById('category-name');
+    const examSection = document.getElementById('exam-section');
+    const subjectSection = document.getElementById('subject-section');
+
+    let questionsData = [];
+    let currentSubject = '';
+    const excelFileURL = "https://webdr-creator.github.io/Excel/MCQD.xlsx";
+
+    fetch(excelFileURL)
+        .then(response => response.arrayBuffer())
+        .then(data => {
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            const subjects = new Set();
+            for (let i = 1; i < json.length; i++) {
+                const row = json[i];
+                if (!row || !row[8]) continue;
+                subjects.add(row[8]);
+                questionsData.push({
+                    subject: row[8],
+                    col10: row[9] || '',
+                    col11: row[10] || ''
+                });
+            }
+
+            subjects.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                subjectSelect.appendChild(opt);
+            });
+            subjectSection.style.display = 'block';
+        });
+
+    startBtn.addEventListener('click', function() {
+        currentSubject = subjectSelect.value;
+        const col10Val = column10Info.value || '';
+        const col11Val = column11Select.value || '';
+
+        subjectNameElement.textContent = currentSubject;
+        chapterNameElement.textContent = col10Val || 'بدون فصل';
+        categoryNameElement.textContent = col11Val || 'الكل';
+        categoryNameElement.style.display = 'block';
+
+        subjectSection.style.display = 'none';
+        examSection.style.display = 'block';
+    });
+});
+</script>
+</body>
+</html>
