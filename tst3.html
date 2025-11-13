@@ -5,6 +5,148 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>WAY</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
+/* ... الأسطر السابقة ... */
+
+/* أضف بعض التنسيقات للقوائم المفلترة الجديدة */
+#columns-10-11-section {
+    margin: 12px 0;
+    background: #f7fcfe;
+    border: 2px solid var(--primary-light);
+    border-radius: 9px;
+    padding: 14px;
+    display: none;
+    box-shadow: 0 2px 10px rgba(0,140,186,0.06);
+}
+#columns-10-11-section label {
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 5px;
+    display: block;
+}
+#column10-select, #column11-select {
+    padding: 5px;
+    min-width: 170px;
+    margin-bottom: 13px;
+}
+</style>
+<!-- ... بقية CSS ... -->
+</head>
+<body>
+<!-- ... الصفحة الأصلية ... -->
+
+<!-- مثال: قائمة اختيار العمود 9 (إذا لم تكن موجودة أضفها) -->
+<div class="selection-container">
+    <label for="column9-select">اختر من العمود 9:</label>
+    <select id="column9-select">
+        <option value="">اختر...</option>
+        <option value="item9a">عنصر 9-أ</option>
+        <option value="item9b">عنصر 9-ب</option>
+        <!-- أضف المزيد حسب بياناتك -->
+    </select>
+</div>
+
+<!-- القوائم المفلترة للعمود 10 و 11 -->
+<div id="columns-10-11-section">
+    <label for="column10-select">اختر من العمود 10:</label>
+    <select id="column10-select" multiple>
+        <option value="all" selected>الكل</option>
+        <option value="item101">عنصر ١٠-١</option>
+        <option value="item102">عنصر ١٠-٢</option>
+        <option value="item103">عنصر ١٠-٣</option>
+        <!-- أكمل حسب بياناتك -->
+    </select>
+    <br>
+    <label for="column11-select">اختر من العمود 11:</label>
+    <select id="column11-select" multiple>
+        <option value="all" selected>الكل</option>
+        <option value="item111">عنصر ١١-١</option>
+        <option value="item112">عنصر ١١-٢</option>
+        <option value="item113">عنصر ١١-٣</option>
+        <!-- أكمل حسب بياناتك -->
+    </select>
+</div>
+
+<!-- زر بدء التجربة/الاختبار مثال -->
+<button id="start-btn" class="start-btn">ابدأ التجربة</button>
+
+<!-- ... بقية الصفحة الأصلية ... -->
+
+<script>
+/* --- الكود الخاص بفلترة الأعمدة --- */
+
+// إظهار قوائم الأعمدة 10 و 11 بعد اختيار من العمود 9
+document.getElementById('column9-select').addEventListener('change', function() {
+    if (this.value !== "") {
+        document.getElementById('columns-10-11-section').style.display = 'block';
+        // إعادة ضبط القوائم لاختيار "الكل" افتراضياً
+        document.getElementById('column10-select').selectedIndex = 0;
+        document.getElementById('column11-select').selectedIndex = 0;
+    } else {
+        document.getElementById('columns-10-11-section').style.display = 'none';
+    }
+});
+
+// إذا اختار المستخدم أي عنصر من القوائم، يتم إزالة اختيار "الكل" تلقائياً
+document.getElementById('column10-select').addEventListener('change', function(e){
+    const selectedOptions = Array.from(this.selectedOptions).map(opt=>opt.value);
+    if (selectedOptions.length > 1 && selectedOptions.includes("all")) {
+        // إزالة خيار "الكل" إذا تم تحديد خيار آخر
+        this.options[0].selected = false;
+    }
+});
+document.getElementById('column11-select').addEventListener('change', function(e){
+    const selectedOptions = Array.from(this.selectedOptions).map(opt=>opt.value);
+    if (selectedOptions.length > 1 && selectedOptions.includes("all")) {
+        // إزالة خيار "الكل" إذا تم تحديد خيار آخر
+        this.options[0].selected = false;
+    }
+});
+
+// دالة جلب المختارات النهائية مع تفعيل "الكل" تلقائي
+function getSelectedColumn(columnId) {
+    const select = document.getElementById(columnId);
+    const selected = Array.from(select.selectedOptions).map(opt => opt.value);
+    if (selected.length === 0 || selected.includes('all')) {
+        // جميع العناصر عدا "الكل"
+        return Array.from(select.options)
+            .filter(opt => opt.value !== 'all')
+            .map(opt => opt.value);
+    }
+    return selected;
+}
+
+// عند الضغط زر ابدأ - مثال على استخدام الفلترة
+document.getElementById('start-btn').addEventListener('click', function() {
+    const col9 = document.getElementById('column9-select').value;
+    if (!col9) { alert("يرجى اختيار من العمود 9 أولاً."); return; }
+    const col10 = getSelectedColumn('column10-select');
+    const col11 = getSelectedColumn('column11-select');
+    alert(
+      "تم اختيار:\nعمود 9: " + col9 +
+      "\nعمود 10: " + col10.join(", ") +
+      "\nعمود 11: " + col11.join(", ")
+    );
+    // هنا تستخدم القيم col10 و col11 للفلترة، أو المتابعة في منطقك
+});
+
+/* --- نهاية كود الفلترة --- */
+
+// ... الكود الأصلي للملف (يفضل إبقاء جميع وظائفك الأخرى كما هي) ...
+
+</script>
+<!-- ... بقية الصفحة الأصلية ... -->
+</body>
+</html>
+<!DOCTYPE html>
+
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WAY</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
 const colorBtn = document.getElementById('colorBtn');
 const palette = document.getElementById('palette');
