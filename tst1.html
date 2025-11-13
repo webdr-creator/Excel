@@ -1217,30 +1217,56 @@ updateColumn10Info();
     }
     
 function updateColumn10Info() {
-        column10Info.innerHTML = '';
-        // إضافة خيار "الكل" كخيار افتراضي
-        const allOpt = document.createElement("option");
-        allOpt.value = "الكل";
-        allOpt.textContent = "الكل";
-        allOpt.selected = true;
-        column10Info.appendChild(allOpt);
+    column10Info.innerHTML = '';
+    // إضافة خيار الكل افتراضياً وتفعيله
+    const allOpt10 = document.createElement("option");
+    allOpt10.value = "الكل";
+    allOpt10.textContent = "الكل";
+    column10Info.appendChild(allOpt10);
+    column10Info.value = "الكل";
 
-        let col10Set = new Set();
+    const column11Select = document.getElementById('column11-select');
+    column11Select.innerHTML = '';
+    const allOpt11 = document.createElement("option");
+    allOpt11.value = "الكل";
+    allOpt11.textContent = "الكل";
+    column11Select.appendChild(allOpt11);
+    column11Select.value = "الكل";
+
+    column11Select.style.display = 'inline-block';
+
+    let col10Set = new Set();
+    questionsData.forEach(q => {
+        if (q.subject === currentSubject && q.col10) col10Set.add(q.col10);
+    });
+    col10Set.forEach(val => {
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        column10Info.appendChild(opt);
+    });
+
+    column10Info.onchange = function() {
+        column11Select.innerHTML = '';
+        const allOpt11b = document.createElement('option');
+        allOpt11b.value = 'الكل';
+        allOpt11b.textContent = 'الكل';
+        column11Select.appendChild(allOpt11b);
+
+        let col11Set = new Set();
         questionsData.forEach(q => {
-            if (q.subject === currentSubject && q.col10) col10Set.add(q.col10);
+            if (q.subject === currentSubject && (this.value === 'الكل' || q.col10 === this.value) && q.col11)
+                col11Set.add(q.col11);
         });
-
-        if (col10Set.size === 0) {
-            // لا توجد معلومات إضافية، نترك خيار "الكل" فقط
-            // (الخيار "الكل" مضيف سابقاً)
-        } else {
-            col10Set.forEach(val => {
-                const opt = document.createElement('option');
-                opt.value = val;
-                opt.textContent = val;
-                column10Info.appendChild(opt);
-            });
-        }
+        col11Set.forEach(val => {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = val;
+            column11Select.appendChild(opt);
+        });
+        column11Select.value = 'الكل';
+    };
+}
 
         const column11Select = document.getElementById('column11-select');
         column11Select.innerHTML = '';
