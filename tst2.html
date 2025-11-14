@@ -2145,7 +2145,7 @@ document.querySelectorAll('.note-popup').forEach(note => {
     if (!pw || pw.trim() === '') {
       return { ok: false, msg: 'يرجى إدخال الكود' };
     }
-    const url = 'https://mcq-app.github.io/WAY/password.xlsx';
+    const url = 'https://mcq-app.github.io/WAY/password2.xlsx';
     try {
       const resp = await fetch(url);
       if (!resp.ok) return { ok: false, msg: 'فشل تحميل ملف كلمات المرور.' };
