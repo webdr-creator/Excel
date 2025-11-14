@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="utf-8" />
@@ -14,10 +13,9 @@
       margin:0;
       min-height:100vh;
       display:flex;
-      align-items:flex-start;
       justify-content:center;
       background:#f4f4f9;
-      font-family: "Segoe UI", Tahoma, sans-serif;
+      font-family:"Segoe UI", sans-serif;
       padding-top:30px;
     }
 
@@ -40,31 +38,30 @@
       letter-spacing:2px;
     }
 
-    /* جعل جميع الخانات تحت بعضها */
     .container{
       padding:22px;
       display:flex;
-      flex-direction:column; /* <-- هذا هو الحل */
-      gap:18px;
+      flex-direction:column;
+      gap:16px;
+      align-items:center; /* يقلل العرض ويضعهم في الوسط */
     }
 
     .box{
+      width:85%;          /* ← تصغير العرض */
       background:var(--green);
       color:#fff;
-      padding:18px 12px;
+      padding:16px 12px;
       border-radius:10px;
       text-align:center;
-      font-size:1.0rem;
+      font-size:1.05rem;
       cursor:pointer;
       box-shadow:0 6px 16px rgba(0,0,0,0.1);
       transition:.2s;
-      white-space:normal;
-      line-height:1.4;
     }
 
     .box:hover{
       background:var(--green-hover);
-      transform:translateY(-4px);
+      transform:translateY(-3px);
     }
   </style>
 </head>
@@ -76,17 +73,17 @@
 
     <div class="container">
 
-      <div class="box">السنة الثانية<br>الفصل الأول</div>
-      <div class="box">السنة الثانية<br>الفصل الثاني</div>
+      <div class="box">السنة الثانية – الفصل الأول</div>
+      <div class="box">السنة الثانية – الفصل الثاني</div>
 
-      <div class="box">السنة الثالثة<br>الفصل الأول</div>
-      <div class="box">السنة الثالثة<br>الفصل الثاني</div>
+      <div class="box">السنة الثالثة – الفصل الأول</div>
+      <div class="box">السنة الثالثة – الفصل الثاني</div>
 
-      <div class="box">السنة الرابعة<br>الفصل الأول</div>
-      <div class="box">السنة الرابعة<br>الفصل الثاني</div>
+      <div class="box">السنة الرابعة – الفصل الأول</div>
+      <div class="box">السنة الرابعة – الفصل الثاني</div>
 
-      <div class="box">السنة الخامسة<br>الفصل الأول</div>
-      <div class="box">السنة الخامسة<br>الفصل الثاني</div>
+      <div class="box">السنة الخامسة – الفصل الأول</div>
+      <div class="box">السنة الخامسة – الفصل الثاني</div>
 
     </div>
   </div>
