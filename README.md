@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -15,21 +16,33 @@
             flex-direction: column;
             color: #333;
         }
+        .app-title-wrapper {
+            width: 80%;
+            max-width: 1200px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 4px solid #4CAF50;
+            border-radius: 10px;
+            text-align: center;
+            background-color: #ffffff;
+        }
         .app-title {
             font-size: 3em;
-            margin-bottom: 40px;
             color: #4CAF50;
             text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
             letter-spacing: 3px;
-            text-align: center;
         }
         .container {
+            width: 80%;
+            max-width: 1200px;
+            padding: 20px;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 30px;
-            width: 90%;
-            max-width: 1200px;
-            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .box {
             padding: 25px;
@@ -46,32 +59,22 @@
             background-color: #45a049;
             transform: translateY(-5px);
         }
-        .row {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-        }
     </style>
 </head>
 <body>
-    <div class="app-title">WAY</div>
+    <div class="app-title-wrapper">
+        <div class="app-title">WAY</div>
+    </div>
+
     <div class="container">
-        <div class="row">
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الأول</div>
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الثاني</div>
-        </div>
-        <div class="row">
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الأول</div>
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الثاني</div>
-        </div>
-        <div class="row">
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الأول</div>
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الثاني</div>
-        </div>
-        <div class="row">
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الأول</div>
-            <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الثاني</div>
-        </div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الأول</div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الثاني</div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الأول</div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الثاني</div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الأول</div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الثاني</div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الأول</div>
+        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الثاني</div>
     </div>
 </body>
 </html>
