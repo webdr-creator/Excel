@@ -12,6 +12,16 @@
         background: #e8e8e8;
     }
 
+    /* حاوية تشمل العنوان والمحتوى ليصبح العرض موحد */
+    .container {
+        width: 90%;
+        max-width: 900px;
+        margin: 20px auto;
+        border-radius: 20px;
+        overflow: hidden; /* يجعل الزوايا منحنية ومتصلة */
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
     /* العنوان الأخضر */
     .header {
         background: #4CAF50;
@@ -20,19 +30,12 @@
         font-size: 2.3rem;
         font-weight: bold;
         color: white;
-        border-radius: 0 0 20px 20px;
-        margin-bottom: 0; /* يمنع وجود فراغ */
     }
 
-    /* المربع الأبيض ملتصق بالعنوان */
+    /* المربع الأبيض */
     .content-box {
         background: #fff;
-        width: 90%;
-        max-width: 900px;
-        margin: 0 auto;  /* إزالة المسافة بين المربعين */
         padding: 35px 10px;
-        border-radius: 0 0 15px 15px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -62,21 +65,25 @@
 
 <body>
 
-    <div class="header">WAY</div>
+    <div class="container">
 
-    <div class="content-box">
+        <div class="header">WAY</div>
 
-        <div class="box">السنة الثانية – الفصل الأول</div>
-        <div class="box">السنة الثانية – الفصل الثاني</div>
+        <div class="content-box">
 
-        <div class="box">السنة الثالثة – الفصل الأول</div>
-        <div class="box">السنة الثالثة – الفصل الثاني</div>
+            <div class="box">السنة الثانية – الفصل الأول</div>
+            <div class="box">السنة الثانية – الفصل الثاني</div>
 
-        <div class="box">السنة الرابعة – الفصل الأول</div>
-        <div class="box">السنة الرابعة – الفصل الثاني</div>
+            <div class="box">السنة الثالثة – الفصل الأول</div>
+            <div class="box">السنة الثالثة – الفصل الثاني</div>
 
-        <div class="box">السنة الخامسة – الفصل الأول</div>
-        <div class="box">السنة الخامسة – الفصل الثاني</div>
+            <div class="box">السنة الرابعة – الفصل الأول</div>
+            <div class="box">السنة الرابعة – الفصل الثاني</div>
+
+            <div class="box">السنة الخامسة – الفصل الأول</div>
+            <div class="box">السنة الخامسة – الفصل الثاني</div>
+
+        </div>
 
     </div>
 
