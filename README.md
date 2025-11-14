@@ -10,16 +10,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             height: 100vh;
             margin: 0;
             background-color: #f4f4f4;
         }
+        .app-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
         .container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 20px;
             width: 80%;
-            max-width: 1000px;
+            max-width: 600px;
         }
         .box {
             padding: 20px;
@@ -36,6 +42,7 @@
     </style>
 </head>
 <body>
+    <div class="app-title">WAY</div>
     <div class="container">
         <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الأول</div>
         <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الثاني</div>
