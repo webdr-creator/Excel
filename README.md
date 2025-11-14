@@ -40,25 +40,25 @@
     }
 
     .container{
-      padding:22px;
-      padding-top:35px;   /* ← جعل الخانات تنزل داخل المربع الأبيض */
+      padding:30px 20px;
       display:flex;
       flex-direction:column;
       gap:14px;
-      align-items:center;
+      align-items:center; /* ← تمركز الخانات في الوسط */
     }
 
     .box{
-      width:65%;
+      display:inline-block;
       background:var(--green);
       color:#fff;
-      padding:15px 10px;
+      padding:12px 18px;   /* حجم مناسب للنص */
       border-radius:10px;
       text-align:center;
       font-size:1.05rem;
       cursor:pointer;
-      box-shadow:0 6px 16px rgba(0,0,0,0.1);
+      box-shadow:0 6px 14px rgba(0,0,0,0.1);
       transition:.2s;
+      white-space:nowrap;  /* ← يمنع كسر الجملة لسطرين */
     }
 
     .box:hover{
