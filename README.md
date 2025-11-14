@@ -40,14 +40,12 @@
       letter-spacing:2px;
     }
 
-    /* هنا نجبر الخانات أن تبقى خانتين مهما كان حجم الشاشة */
+    /* جعل جميع الخانات تحت بعضها */
     .container{
       padding:22px;
-      display:grid;
-      grid-template-columns: 1fr 1fr; /* ثنائيات دائمًا */
+      display:flex;
+      flex-direction:column; /* <-- هذا هو الحل */
       gap:18px;
-      overflow-x: auto; /* في حال ضاقت الشاشة نسمح بالتمرير */
-      scrollbar-width: thin;
     }
 
     .box{
@@ -78,17 +76,17 @@
 
     <div class="container">
 
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية<br>الفصل الأول</div>
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية<br>الفصل الثاني</div>
+      <div class="box">السنة الثانية<br>الفصل الأول</div>
+      <div class="box">السنة الثانية<br>الفصل الثاني</div>
 
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة<br>الفصل الأول</div>
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة<br>الفصل الثاني</div>
+      <div class="box">السنة الثالثة<br>الفصل الأول</div>
+      <div class="box">السنة الثالثة<br>الفصل الثاني</div>
 
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة<br>الفصل الأول</div>
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة<br>الفصل الثاني</div>
+      <div class="box">السنة الرابعة<br>الفصل الأول</div>
+      <div class="box">السنة الرابعة<br>الفصل الثاني</div>
 
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة<br>الفصل الأول</div>
-      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة<br>الفصل الثاني</div>
+      <div class="box">السنة الخامسة<br>الفصل الأول</div>
+      <div class="box">السنة الخامسة<br>الفصل الثاني</div>
 
     </div>
   </div>
