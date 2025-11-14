@@ -1,94 +1,104 @@
+<!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAY</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 40px;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WAY</title>
+  <style>
+    :root{
+      --green:#4CAF50;
+      --green-hover:#45a049;
+      --card-width:700px;
+    }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      background:#f4f4f9;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      padding:40px 16px;
+      color:#222;
+    }
 
-        /* مربع العنوان */
-        .app-title-wrapper {
-            width: 80%;
-            max-width: 700px;
-            background-color: #4CAF50;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+    /* البطاقة التي تجمع العنوان والمحتوى — بحيث يكونان ملتصقين */
+    .card{
+      width:90%;
+      max-width:var(--card-width);
+      border-radius:12px;
+      overflow:hidden; /* هذا يلتصق العنوان مع الصندوق لأن الحواف مقطوعة على البطاقة */
+      box-shadow:0 8px 24px rgba(0,0,0,0.12);
+      background:#fff;
+    }
 
-        .app-title {
-            font-size: 2.5em;
-            color: white;
-            font-weight: bold;
-            letter-spacing: 3px;
-        }
+    /* العنوان — ممتلئ باللون */
+    .card .title{
+      background:var(--green);
+      color:#fff;
+      text-align:center;
+      padding:24px 18px;
+      font-size:1.9rem;
+      font-weight:700;
+      letter-spacing:2px;
+    }
 
-        /* صندوق الخانات */
-        .container {
-            width: 80%;
-            max-width: 700px;
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    /* الصندوق الذي يحتوي الخانات — ملتصق مباشرة بالعنوان لأنهما داخل البطاقة نفسها */
+    .card .container{
+      padding:22px;
+      background:#ffffff;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr)); /* اثنتان في كل صف */
+      gap:18px;
+      align-items:stretch;
+    }
 
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px; /* المسافة بين الخانات */
-        }
+    /* كل خانة */
+    .box{
+      background:var(--green);
+      color:#fff;
+      padding:18px 14px;
+      border-radius:10px;
+      text-align:center;
+      font-size:1.05rem;
+      cursor:pointer;
+      box-shadow:0 6px 16px rgba(0,0,0,0.08);
+      transition: transform .18s ease, background .18s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      line-height:1.3;
+      white-space:normal;
+    }
+    .box:hover{ background:var(--green-hover); transform:translateY(-4px); }
 
-        /* تصميم الخانات */
-        .box {
-            padding: 20px;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+    /* لضمان أن نصوص العربية الطويلة تظهر في صفين داخل الخانة بشكل جميل */
+    .box br{ display:none; }
 
-        .box:hover {
-            background-color: #45a049;
-            transform: translateY(-5px);
-        }
-    </style>
+    /* -- ملاحظة responsiveness --
+       على شاشات ضيقة جداً قد تتكدس الخانات رأسياً لأن المساحة لا تكفي؛
+       إن أردت إجبارها لتبقى ثنائيات حتى على الموبايل يمكن تقليل حجم النص أو السماح للتمرير، أخبرني. */
+  </style>
 </head>
 <body>
 
-    <!-- العنوان -->
-    <div class="app-title-wrapper">
-        <div class="app-title">WAY</div>
-    </div>
+  <div class="card">
+    <div class="title">WAY</div>
 
-    <!-- الخانات الثنائية -->
     <div class="container">
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية<br>الفصل الأول</div>
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية<br>الفصل الثاني</div>
 
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الأول</div>
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الثاني</div>
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة<br>الفصل الأول</div>
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة<br>الفصل الثاني</div>
 
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الأول</div>
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الثاني</div>
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة<br>الفصل الأول</div>
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة<br>الفصل الثاني</div>
 
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الأول</div>
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الثاني</div>
-
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الأول</div>
-        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الثاني</div>
-
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة<br>الفصل الأول</div>
+      <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة<br>الفصل الثاني</div>
     </div>
+  </div>
 
 </body>
 </html>
