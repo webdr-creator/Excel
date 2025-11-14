@@ -1,8 +1,10 @@
+<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>WAY</title>
+
   <style>
     :root{
       --green:#4CAF50;
@@ -35,22 +37,21 @@
       padding:25px 18px;
       font-size:2.3rem;
       font-weight:bold;
-      letter-spacing:2px;
     }
 
     .container{
       padding:22px;
       display:flex;
       flex-direction:column;
-      gap:16px;
-      align-items:center; /* يقلل العرض ويضعهم في الوسط */
+      gap:14px;
+      align-items:center;  /* ← وضع كل الخانات في المنتصف */
     }
 
     .box{
-      width:85%;          /* ← تصغير العرض */
+      width:65%;            /* ← تصغير العرض أكثر */
       background:var(--green);
       color:#fff;
-      padding:16px 12px;
+      padding:15px 10px;
       border-radius:10px;
       text-align:center;
       font-size:1.05rem;
