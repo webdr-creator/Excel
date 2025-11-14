@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -6,55 +5,61 @@
     <title>WAY</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             background-color: #f4f4f9;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-            color: #333;
+            align-items: flex-start;
+            padding-top: 40px;
         }
+
+        /* مربع العنوان */
         .app-title-wrapper {
             width: 80%;
-            max-width: 1200px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 4px solid #4CAF50;
-            border-radius: 10px;
+            max-width: 700px;
+            background-color: #4CAF50;
+            padding: 25px;
+            border-radius: 12px;
             text-align: center;
-            background-color: #ffffff;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
+
         .app-title {
-            font-size: 3em;
-            color: #4CAF50;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            font-size: 2.5em;
+            color: white;
+            font-weight: bold;
             letter-spacing: 3px;
         }
+
+        /* صندوق الخانات */
         .container {
             width: 80%;
-            max-width: 1200px;
-            padding: 20px;
+            max-width: 700px;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            gap: 20px; /* المسافة بين الخانات */
         }
+
+        /* تصميم الخانات */
         .box {
-            padding: 25px;
-            text-align: center;
+            padding: 20px;
             background-color: #4CAF50;
             color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            text-align: center;
             font-size: 1.2em;
-            transition: transform 0.3s ease, background-color 0.3s ease;
             cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
+
         .box:hover {
             background-color: #45a049;
             transform: translateY(-5px);
@@ -62,19 +67,28 @@
     </style>
 </head>
 <body>
+
+    <!-- العنوان -->
     <div class="app-title-wrapper">
         <div class="app-title">WAY</div>
     </div>
 
+    <!-- الخانات الثنائية -->
     <div class="container">
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الأول</div>
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الثاني</div>
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الأول</div>
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الثاني</div>
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الأول</div>
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الثاني</div>
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الأول</div>
-        <div class="box" onclick="window.location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الثاني</div>
+
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الأول</div>
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية الفصل الثاني</div>
+
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الأول</div>
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثالثة الفصل الثاني</div>
+
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الأول</div>
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الرابعة الفصل الثاني</div>
+
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الأول</div>
+        <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة الفصل الثاني</div>
+
     </div>
+
 </body>
 </html>
