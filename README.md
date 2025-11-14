@@ -40,25 +40,26 @@
     }
 
     .container{
-      padding:30px 20px;
+      padding:35px 20px;
       display:flex;
       flex-direction:column;
       gap:14px;
-      align-items:center; /* ← تمركز الخانات في الوسط */
+      align-items:center;     /* ← وضع جميع الخانات في المنتصف */
     }
 
     .box{
       display:inline-block;
       background:var(--green);
       color:#fff;
-      padding:12px 18px;   /* حجم مناسب للنص */
+      padding:12px 18px;
       border-radius:10px;
-      text-align:center;
+      text-align:center;      /* ← محاذاة النص في الوسط */
       font-size:1.05rem;
       cursor:pointer;
       box-shadow:0 6px 14px rgba(0,0,0,0.1);
       transition:.2s;
-      white-space:nowrap;  /* ← يمنع كسر الجملة لسطرين */
+      white-space:nowrap;     /* ← منع انتقال النص لسطرين */
+      direction:rtl;          /* ← إعادة النص العربي لمكانه الطبيعي */
     }
 
     .box:hover{
