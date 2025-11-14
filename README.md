@@ -41,14 +41,15 @@
 
     .container{
       padding:22px;
+      padding-top:35px;   /* ← جعل الخانات تنزل داخل المربع الأبيض */
       display:flex;
       flex-direction:column;
       gap:14px;
-      align-items:center;  /* ← وضع كل الخانات في المنتصف */
+      align-items:center;
     }
 
     .box{
-      width:65%;            /* ← تصغير العرض أكثر */
+      width:65%;
       background:var(--green);
       color:#fff;
       padding:15px 10px;
