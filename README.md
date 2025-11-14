@@ -8,8 +8,8 @@
     :root{
       --green:#4CAF50;
       --green-hover:#45a049;
-      --card-width:700px;
     }
+
     body{
       margin:0;
       min-height:100vh;
@@ -18,74 +18,66 @@
       justify-content:center;
       background:#f4f4f9;
       font-family: "Segoe UI", Tahoma, sans-serif;
-      padding:40px 16px;
-      color:#222;
+      padding-top:30px;
     }
 
-    /* البطاقة التي تجمع العنوان والمحتوى — بحيث يكونان ملتصقين */
     .card{
-      width:90%;
-      max-width:var(--card-width);
-      border-radius:12px;
-      overflow:hidden; /* هذا يلتصق العنوان مع الصندوق لأن الحواف مقطوعة على البطاقة */
-      box-shadow:0 8px 24px rgba(0,0,0,0.12);
+      width:95%;
+      max-width:700px;
+      border-radius:14px;
+      overflow:hidden;
       background:#fff;
+      box-shadow:0 8px 24px rgba(0,0,0,0.12);
     }
 
-    /* العنوان — ممتلئ باللون */
-    .card .title{
+    .title{
       background:var(--green);
       color:#fff;
       text-align:center;
-      padding:24px 18px;
-      font-size:1.9rem;
-      font-weight:700;
+      padding:25px 18px;
+      font-size:2.3rem;
+      font-weight:bold;
       letter-spacing:2px;
     }
 
-    /* الصندوق الذي يحتوي الخانات — ملتصق مباشرة بالعنوان لأنهما داخل البطاقة نفسها */
-    .card .container{
+    /* هنا نجبر الخانات أن تبقى خانتين مهما كان حجم الشاشة */
+    .container{
       padding:22px;
-      background:#ffffff;
       display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr)); /* اثنتان في كل صف */
+      grid-template-columns: 1fr 1fr; /* ثنائيات دائمًا */
       gap:18px;
-      align-items:stretch;
+      overflow-x: auto; /* في حال ضاقت الشاشة نسمح بالتمرير */
+      scrollbar-width: thin;
     }
 
-    /* كل خانة */
     .box{
       background:var(--green);
       color:#fff;
-      padding:18px 14px;
+      padding:18px 12px;
       border-radius:10px;
       text-align:center;
-      font-size:1.05rem;
+      font-size:1.0rem;
       cursor:pointer;
-      box-shadow:0 6px 16px rgba(0,0,0,0.08);
-      transition: transform .18s ease, background .18s ease;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      line-height:1.3;
+      box-shadow:0 6px 16px rgba(0,0,0,0.1);
+      transition:.2s;
       white-space:normal;
+      line-height:1.4;
     }
-    .box:hover{ background:var(--green-hover); transform:translateY(-4px); }
 
-    /* لضمان أن نصوص العربية الطويلة تظهر في صفين داخل الخانة بشكل جميل */
-    .box br{ display:none; }
-
-    /* -- ملاحظة responsiveness --
-       على شاشات ضيقة جداً قد تتكدس الخانات رأسياً لأن المساحة لا تكفي؛
-       إن أردت إجبارها لتبقى ثنائيات حتى على الموبايل يمكن تقليل حجم النص أو السماح للتمرير، أخبرني. */
+    .box:hover{
+      background:var(--green-hover);
+      transform:translateY(-4px);
+    }
   </style>
 </head>
+
 <body>
 
   <div class="card">
     <div class="title">WAY</div>
 
     <div class="container">
+
       <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية<br>الفصل الأول</div>
       <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الثانية<br>الفصل الثاني</div>
 
@@ -97,6 +89,7 @@
 
       <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة<br>الفصل الأول</div>
       <div class="box" onclick="location.href='https://webdr-creator.github.io/Excel/tst1.html'">السنة الخامسة<br>الفصل الثاني</div>
+
     </div>
   </div>
 
