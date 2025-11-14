@@ -1,124 +1,63 @@
-<div align="center">
+<!-- إصلاح ظهور كلمة WAY أعلى الصفحة -->
+&nbsp;
 
-<!-- عنوان التطبيق -->
+<div style="direction: rtl; font-family: 'Cairo', sans-serif;">
+
 <div style="
     background:#4CAF50;
-    padding:30px;
-    font-size:40px;
-    color:white;
-    font-weight:bold;
+    padding:40px 20px;
     border-radius:20px 20px 0 0;
-    width:90%;
-    max-width:900px;">
-WAY
+    text-align:center;
+    color:white;
+    font-size:40px;
+    font-weight:900;">
+    WAY
 </div>
 
-<!-- صندوق المحتوى -->
 <div style="
     background:white;
-    width:90%;
-    max-width:900px;
-    padding:25px 10px;
+    padding:40px;
     border-radius:0 0 20px 20px;
-    box-shadow:0 0 15px rgba(0,0,0,0.1);">
+    box-shadow:0 0 20px rgba(0,0,0,0.1);
+    max-width:900px;
+    margin:auto;
+   ">
 
-<!-- الخانات -->
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
+<style>
+.box {
+    display:block;
+    width:280px;
     background:#4CAF50;
     color:white;
-    text-decoration:none;
-    padding:12px 28px;
+    padding:12px;
+    margin:12px auto;
+    text-align:center;
     border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الثانية – الفصل الأول
-</a>
+    font-size:18px;
+    font-weight:600;
+    text-decoration:none;
+}
+</style>
 
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
-    background:#4CAF50;
-    color:white;
-    text-decoration:none;
-    padding:12px 28px;
-    border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الثانية – الفصل الثاني
-</a>
+<div style="display:flex; justify-content:center; gap:40px; flex-wrap:wrap;">
 
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
-    background:#4CAF50;
-    color:white;
-    text-decoration:none;
-    padding:12px 28px;
-    border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الثالثة – الفصل الأول
-</a>
+    <!-- العمود الأيمن بعد التبديل -->
+    <div>
+        <a class="box">السنة الثانية – الفصل الثاني</a>
+        <a class="box">السنة الثالثة – الفصل الثاني</a>
+        <a class="box">السنة الرابعة – الفصل الثاني</a>
+        <a class="box">السنة الخامسة – الفصل الثاني</a>
+    </div>
 
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
-    background:#4CAF50;
-    color:white;
-    text-decoration:none;
-    padding:12px 28px;
-    border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الثالثة – الفصل الثاني
-</a>
-
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
-    background:#4CAF50;
-    color:white;
-    text-decoration:none;
-    padding:12px 28px;
-    border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الرابعة – الفصل الأول
-</a>
-
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
-    background:#4CAF50;
-    color:white;
-    text-decoration:none;
-    padding:12px 28px;
-    border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الرابعة – الفصل الثاني
-</a>
-
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
-    background:#4CAF50;
-    color:white;
-    text-decoration:none;
-    padding:12px 28px;
-    border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الخامسة – الفصل الأول
-</a>
-
-<a href="https://webdr-creator.github.io/Excel/tst1.html" style="
-    display:inline-block;
-    background:#4CAF50;
-    color:white;
-    text-decoration:none;
-    padding:12px 28px;
-    border-radius:10px;
-    margin:10px;
-    font-size:20px;">
-السنة الخامسة – الفصل الثاني
-</a>
+    <!-- العمود الأيسر بعد التبديل -->
+    <div>
+        <a class="box">السنة الثانية – الفصل الأول</a>
+        <a class="box">السنة الثالثة – الفصل الأول</a>
+        <a class="box">السنة الرابعة – الفصل الأول</a>
+        <a class="box">السنة الخامسة – الفصل الأول</a>
+    </div>
 
 </div>
 
+</div>
 </div>
